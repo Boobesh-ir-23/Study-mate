@@ -44,9 +44,24 @@
 flowchart TD
     A["👨‍🎓 Users (Students & Admin)"] --> B["📱 StudyMate (Web & PWA Client)"]
     B --> C["⚡ Cloudflare Worker (Edge API & Router)"]
-    C --> D[("🗄️ Cloudflare KV (File Index & Metadata)")]
-    C --> E[("🪣 Cloudflare R2 (Files & Media Storage)")]
+    C --> D[("🗄️ Cloudflare KV (File Index, Metadata & Direct Uploads up to 24MB)")]
+    C --> E[("🪣 Cloudflare R2 (Optional Object Storage for Large Files)")]
 ```
+
+---
+
+## 📦 Storage & Upload Limits
+
+StudyMate supports both direct zero-config uploads and external cloud storage links with **zero credit card required**:
+
+| Method | Max File Size | Cost / Card Needed? | Ideal Use Cases |
+|---|:---:|:---:|---|
+| **Direct Upload (Cloudflare KV)** | **24 MB** per file | **100% Free** (No Card) | Lecture slides (PPT/PDF), unit notes, question papers, syllabus copies, lab manuals. |
+| **Google Drive / OneDrive Link** | **Unlimited** (15 GB free per account) | **100% Free** (No Card) | Complete textbooks (50–100MB+), recorded video lectures, software zip files. |
+| **Cloudflare R2 (Optional)** | **100 MB+** per file | **10 GB/mo Free** (Cloudflare Card Verification) | Large institutional deployments requiring self-hosted multi-gigabyte media storage. |
+
+> [!TIP]
+> **Zero Credit Card Setup:** The system default uses native zero-copy binary streaming into Cloudflare KV, allowing direct uploads up to **24 MB per file** on Cloudflare's free tier. For large 100MB+ textbook PDFs or video recordings, simply paste a shared Google Drive link!
 
 ---
 
@@ -215,7 +230,7 @@ https://studymate.<your-subdomain>.workers.dev/?admin
 ### 🛡️ Admin Capabilities Unlocked Upon Login:
 Once authenticated with your `ADMIN_PASSWORD`:
 - **Active Admin Indicator**: An **"Admin Active"** badge appears in the top navigation. Clicking it opens the **Edge Analytics & Storage Telemetry Dashboard** (traffic count, R2 storage gauge, and content statistics).
-- **Direct Upload Dock**: Drag and drop lecture slides, question papers, and PDFs straight into any folder (persists directly into Cloudflare R2 / KV).
+- **Direct Upload Dock**: Drag and drop lecture slides, question papers, and PDFs straight into any folder (up to 24 MB directly via Cloudflare KV, or unlimited size via Google Drive links).
 - **Directory & Resource Controls**: Create new subjects, units, YouTube video playlists, or external Google Drive links.
 - **Context Actions & Shortcuts**:
   - Press `F2` to rename any file or folder.
