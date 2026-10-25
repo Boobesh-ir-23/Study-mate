@@ -418,6 +418,7 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
       max-width: 100%;
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
@@ -2715,6 +2716,7 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
       text-overflow: ellipsis;
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
     }
     .card-meta {
