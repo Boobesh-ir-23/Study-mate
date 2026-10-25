@@ -3,6 +3,7 @@
 # 🎓 StudyMate
 ### Modern Edge-Powered Learning & Resource Hub
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-study--mate.harisgarage.workers.dev-success?style=for-the-badge&logo=cloudflare&logoColor=white)](https://study-mate.harisgarage.workers.dev)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 [![Cloudflare R2](https://img.shields.io/badge/Cloudflare-R2_Storage-EA8C10?style=for-the-badge&logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/r2/)
 [![PWA Ready](https://img.shields.io/badge/PWA-Offline_Ready-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)

@@ -8,15 +8,15 @@ command = "node build.js"
 # Key-Value store for File System hierarchy, sticky notes & suggestions
 [[kv_namespaces]]
 binding = "FILES_DB"
-id = "your-kv-namespace-id"
+id = "1bf0ab2d90b24791b195556082fa9656"
 preview_id = "your-kv-preview-id"
 
 # Cloudflare R2 bucket for zero-egress binary storage (PDFs, PPTs, Images)
-# Create using: wrangler r2 bucket create personal-lms-files
-[[r2_buckets]]
-binding = "FILES_BUCKET"
-bucket_name = "personal-lms-files"
-preview_bucket_name = "personal-lms-files-preview"
+# (Enable R2 on Cloudflare Dashboard to bind personal-lms-files)
+# [[r2_buckets]]
+# binding = "FILES_BUCKET"
+# bucket_name = "personal-lms-files"
+# preview_bucket_name = "personal-lms-files-preview"
 
 # Default environment variables (Non-sensitive)
 [vars]
