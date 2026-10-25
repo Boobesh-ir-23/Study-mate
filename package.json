@@ -1,7 +1,7 @@
 {
   "name": "study-mate",
   "version": "1.0.0",
-  "description": "Modern Edge-Powered Learning & Resource Hub running on Cloudflare Workers, KV, and R2",
+  "description": "Modern edge-native digital study hub & personal LMS powered by Cloudflare Workers, KV, and R2 object storage with multi-format in-browser previews and PWA offline support.",
   "repository": {
     "type": "git",
     "url": "https://github.com/hariharanboss/Study-mate.git"
@@ -15,18 +15,22 @@
     "start": "wrangler dev"
   },
   "keywords": [
-    "lms",
-    "self-hosted",
+    "cloudflare-workers",
+    "cloudflare-r2",
     "cloudflare-kv",
-    "edge-storage",
-    "file-storage",
-    "single-password-auth",
-    "study-tools",
-    "no-login",
-    "lightweight",
-    "serverless"
+    "lms",
+    "learning-management-system",
+    "study-mate",
+    "education",
+    "student-portal",
+    "pwa",
+    "pdf-viewer",
+    "file-manager",
+    "serverless",
+    "glassmorphism",
+    "single-page-application"
   ],
-  "author": "",
+  "author": "hariharanboss (https://github.com/hariharanboss)",
   "license": "MIT",
   "devDependencies": {},
   "engines": {
