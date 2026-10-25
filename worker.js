@@ -84,13 +84,9 @@ async function checkAdminAuth(request, env) {
   const authHeader = request.headers.get('Authorization') || '';
   if (!authHeader.startsWith('Bearer ')) return false;
   const token = authHeader.substring(7).trim();
-  const configured = (env.ADMIN_PASSWORD || '').trim();
-  const secrets = Array.from(new Set([configured, 'admin', 'admin123'].filter(Boolean)));
-  for (const s of secrets) {
-    const payload = await verifyHmacToken(s, token);
-    if (payload && payload.role === 'admin') return true;
-  }
-  return false;
+  const configured = (env.ADMIN_PASSWORD || '').trim() || 'admin';
+  const payload = await verifyHmacToken(configured, token);
+  return !!(payload && payload.role === 'admin');
 }
 
 // In-memory / KV rate limiter
@@ -253,13 +249,10 @@ export default {
       try {
         const body = await request.json();
         const entered = (body.password || '').trim();
-        const configured = (env.ADMIN_PASSWORD || '').trim();
+        const configured = (env.ADMIN_PASSWORD || '').trim() || 'admin';
 
-        const isValid = (configured && entered === configured) || entered === 'admin' || entered === 'admin123';
-
-        if (isValid) {
-          const secret = (configured && entered === configured) ? configured : entered;
-          const token = await createHmacToken(secret, {
+        if (entered && entered === configured) {
+          const token = await createHmacToken(configured, {
             role: 'admin',
             iat: Date.now(),
             exp: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
