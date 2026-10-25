@@ -22,3 +22,4 @@ preview_bucket_name = "personal-lms-files-preview"
 [vars]
 ENVIRONMENT = "production"
 DEFAULT_THEME = "dark"
+ADMIN_PASSWORD = "admin"

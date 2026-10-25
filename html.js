@@ -8518,7 +8518,7 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
         if (e && e.preventDefault) e.preventDefault();
         const pwdInput = document.getElementById('admin-password-input');
         const submitBtn = document.getElementById('btn-submit-admin-login');
-        const password = pwdInput ? pwdInput.value : '';
+        const password = pwdInput ? pwdInput.value.trim() : '';
 
         if (!password) {
           showToast('Please enter the admin password', 'error');
