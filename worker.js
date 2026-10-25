@@ -362,23 +362,19 @@ export default {
             }
           });
         } else if (env.FILES_DB) {
-          if (fileBytes.byteLength > 20 * 1024 * 1024) {
+          if (fileBytes.byteLength > 24 * 1024 * 1024) {
             return jsonResponse({
               success: false,
-              error: 'File size exceeds 20MB KV limit. Please configure Cloudflare R2 for unlimited file sizes.'
+              error: 'File size exceeds Cloudflare KV 24MB limit. For larger textbooks, please use a Google Drive link.'
             }, 413);
           }
-          let binary = '';
-          const bytes = new Uint8Array(fileBytes);
-          for (let i = 0; i < bytes.byteLength; i++) {
-            binary += String.fromCharCode(bytes[i]);
-          }
-          const base64Data = btoa(binary);
-          await env.FILES_DB.put(`blob_${uniqueKey}`, JSON.stringify({
-            data: base64Data,
-            mimeType: file.type || 'application/octet-stream',
-            name: customName
-          }));
+          // Zero-copy direct binary storage in Cloudflare KV with metadata (0ms CPU, zero RAM bloat)
+          await env.FILES_DB.put(`blob_${uniqueKey}`, fileBytes, {
+            metadata: {
+              mimeType: file.type || 'application/octet-stream',
+              name: customName
+            }
+          });
         }
 
         return jsonResponse({
@@ -472,29 +468,52 @@ export default {
         }
 
         if (env.FILES_DB) {
+          // 1. Try reading native binary with metadata (high performance, zero CPU overhead)
+          const res = await env.FILES_DB.getWithMetadata(`blob_${storageKey}`, { type: 'arrayBuffer' });
+          if (res && res.value) {
+            const fileName = (res.metadata && res.metadata.name) || storageKey;
+            const fileMime = (res.metadata && res.metadata.mimeType) || 'application/octet-stream';
+            const mimeInfo = getFileStreamMime(fileName, fileMime);
+            const disposition = isDownloadParam ? 'attachment' : 'inline';
+
+            return new Response(res.value, {
+              headers: {
+                'content-type': mimeInfo.mime,
+                'content-disposition': `${disposition}; filename="${encodeURIComponent(fileName)}"`,
+                'cache-control': 'public, max-age=86400',
+                'Access-Control-Allow-Origin': '*'
+              }
+            });
+          }
+
+          // 2. Backward compatibility fallback for legacy Base64 JSON strings
           const raw = await env.FILES_DB.get(`blob_${storageKey}`);
           if (!raw) {
             return new Response('File not found in storage', { status: 404 });
           }
-          const blobMeta = JSON.parse(raw);
-          const binaryStr = atob(blobMeta.data);
-          const len = binaryStr.length;
-          const bytes = new Uint8Array(len);
-          for (let i = 0; i < len; i++) {
-            bytes[i] = binaryStr.charCodeAt(i);
-          }
-
-          const mimeInfo = getFileStreamMime(blobMeta.name || storageKey, blobMeta.mimeType || 'application/octet-stream');
-          const disposition = isDownloadParam ? 'attachment' : 'inline';
-
-          return new Response(bytes, {
-            headers: {
-              'content-type': mimeInfo.mime,
-              'content-disposition': `${disposition}; filename="${encodeURIComponent(blobMeta.name || storageKey)}"`,
-              'cache-control': 'public, max-age=86400',
-              'Access-Control-Allow-Origin': '*'
+          try {
+            const blobMeta = JSON.parse(raw);
+            const binaryStr = atob(blobMeta.data);
+            const len = binaryStr.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+              bytes[i] = binaryStr.charCodeAt(i);
             }
-          });
+
+            const mimeInfo = getFileStreamMime(blobMeta.name || storageKey, blobMeta.mimeType || 'application/octet-stream');
+            const disposition = isDownloadParam ? 'attachment' : 'inline';
+
+            return new Response(bytes, {
+              headers: {
+                'content-type': mimeInfo.mime,
+                'content-disposition': `${disposition}; filename="${encodeURIComponent(blobMeta.name || storageKey)}"`,
+                'cache-control': 'public, max-age=86400',
+                'Access-Control-Allow-Origin': '*'
+              }
+            });
+          } catch (e) {
+            return new Response('File not found or corrupted', { status: 404 });
+          }
         }
 
         return new Response('No storage backend configured', { status: 500 });
