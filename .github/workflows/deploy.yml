@@ -23,6 +23,14 @@ jobs:
       - name: Install Dependencies
         run: npm ci || npm install
 
+      - name: Configure Production Bindings
+        env:
+          KV_ID: ${{ secrets.CLOUDFLARE_KV_ID }}
+        run: |
+          if [ -n "$KV_ID" ]; then
+            sed -i "s/your-kv-namespace-id/$KV_ID/g" wrangler.toml
+          fi
+
       - name: Compile Inlined Edge Assets
         run: node build.js
 

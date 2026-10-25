@@ -8,7 +8,7 @@ command = "node build.js"
 # Key-Value store for File System hierarchy, sticky notes & suggestions
 [[kv_namespaces]]
 binding = "FILES_DB"
-id = "48e1af0f095e413fbeef52f2a5bd5aa3"
+id = "your-kv-namespace-id"
 preview_id = "your-kv-preview-id"
 
 # Cloudflare R2 bucket for zero-egress binary storage (PDFs, PPTs, Images)
@@ -22,4 +22,3 @@ preview_id = "your-kv-preview-id"
 [vars]
 ENVIRONMENT = "production"
 DEFAULT_THEME = "dark"
-ADMIN_PASSWORD = "admin"
