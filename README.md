@@ -195,6 +195,36 @@ npx wrangler deploy --keep-vars
 
 ---
 
+## 🔐 Accessing the Admin Portal
+
+To keep the interface clean and distraction-free for students, StudyMate intentionally conceals administrative buttons. There are **two discreet ways** to open the Admin Authentication modal:
+
+### 1. Keyboard Shortcut (Desktop & Laptop)
+Press **`Ctrl + Shift + A`** (or **`Cmd + Shift + A`** on macOS) anywhere on the page.
+
+### 2. Direct URL Query (Mobile, Tablet, or Browser)
+Append `?admin` or `/#admin` to the end of your site URL:
+```text
+https://studymate.<your-subdomain>.workers.dev/?admin
+```
+> [!NOTE]
+> This is especially useful on smartphones and tablets where physical modifier keys are not available.
+
+---
+
+### 🛡️ Admin Capabilities Unlocked Upon Login:
+Once authenticated with your `ADMIN_PASSWORD`:
+- **Active Admin Indicator**: An **"Admin Active"** badge appears in the top navigation. Clicking it opens the **Edge Analytics & Storage Telemetry Dashboard** (traffic count, R2 storage gauge, and content statistics).
+- **Direct Upload Dock**: Drag and drop lecture slides, question papers, and PDFs straight into any folder (persists directly into Cloudflare R2 / KV).
+- **Directory & Resource Controls**: Create new subjects, units, YouTube video playlists, or external Google Drive links.
+- **Context Actions & Shortcuts**:
+  - Press `F2` to rename any file or folder.
+  - Press `Delete` to move an item to the **Recycle Bin** (items can be restored or permanently purged).
+- **Live Campus Broadcasts**: Publish urgent top-bar announcements or exam updates to all students in real-time.
+- **Review Queue**: Inspect and approve materials suggested by students via the Suggestion Queue.
+
+---
+
 ## 📋 API & Edge Endpoints
 
 | Method | Endpoint | Access | Description |
