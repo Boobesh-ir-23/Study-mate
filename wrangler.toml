@@ -1,4 +1,4 @@
-name = "study-mate"
+name = "studymate"
 main = "worker.js"
 compatibility_date = "2024-09-01"
 
@@ -8,7 +8,7 @@ command = "node build.js"
 # Key-Value store for File System hierarchy, sticky notes & suggestions
 [[kv_namespaces]]
 binding = "FILES_DB"
-id = "1bf0ab2d90b24791b195556082fa9656"
+id = "48e1af0f095e413fbeef52f2a5bd5aa3"
 preview_id = "your-kv-preview-id"
 
 # Cloudflare R2 bucket for zero-egress binary storage (PDFs, PPTs, Images)
