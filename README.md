@@ -1,4 +1,7 @@
-# 🎓 StudyMate — Modern Edge-Powered Learning & Resource Hub
+<div align="center">
+
+# 🎓 StudyMate
+### Modern Edge-Powered Learning & Resource Hub
 
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 [![Cloudflare R2](https://img.shields.io/badge/Cloudflare-R2_Storage-EA8C10?style=for-the-badge&logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/r2/)
@@ -6,7 +9,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/hariharanboss/Study-mate?style=for-the-badge&color=gold)](https://github.com/hariharanboss/Study-mate/stargazers)
 
-**StudyMate** is an ultra-fast, edge-native digital study hub and personal learning management system built for students, educators, and lifelong learners. Powered entirely by Cloudflare Workers, Cloudflare KV, and Cloudflare R2 object storage, it delivers zero-latency document browsing, multi-format in-browser previews, and full administrative capabilities with zero server maintenance and zero egress fees.
+<p align="center">
+  <b>StudyMate</b> is an ultra-fast, edge-native digital study hub and personal learning management system built for students, educators, and lifelong learners. Powered entirely by Cloudflare Workers, Cloudflare KV, and Cloudflare R2 object storage, it delivers zero-latency document browsing, multi-format in-browser previews, and full administrative capabilities with zero server maintenance and zero egress fees.
+</p>
+
+</div>
 
 ---
 
@@ -33,24 +40,85 @@
 ## 🏗️ Architecture
 
 ```mermaid
-graph TD
-    User["👨‍🎓 Student / Visitor"] -->|HTTP / PWA| Edge["🌐 Cloudflare Worker (Edge API & UI)"]
-    Admin["👨‍🏫 Administrator"] -->|Secured Admin Auth| Edge
-    
-    subgraph Cloudflare Infrastructure
-        Edge -->|Read / Write Metadata| KV["⚡ Cloudflare KV (File Hierarchy & Index)"]
-        Edge -->|Stream Chunks / Uploads| R2["🪣 Cloudflare R2 (Binary Object Storage)"]
+flowchart TD
+    subgraph Users ["👥 Access Layer"]
+        direction LR
+        Student["👨‍🎓 Student / Visitor"]
+        Admin["👨‍🏫 Administrator"]
     end
-    
-    subgraph Client-Side Rendering Engine
-        Edge --> Viewer["🖥️ Interactive Browser Shell"]
-        Viewer --> PDFEngine["PDF.js Reader"]
-        Viewer --> DocxEngine["Mammoth.js Engine"]
-        Viewer --> CodeEngine["Highlight.js Syntax"]
-        Viewer --> MediaEngine["Plyr Audio/Video"]
-        Viewer --> NotePadEngine["Rich Notepad Editor"]
+
+    subgraph Edge ["🌐 Cloudflare Serverless Edge"]
+        Worker["⚡ Cloudflare Worker<br/>(Router, Auth & Edge UI)"]
+        KV[("🗄️ Cloudflare KV<br/>Hierarchy Index")]
+        R2[("🪣 Cloudflare R2<br/>Object Storage")]
+        Worker <-->|Metadata Index| KV
+        Worker <-->|Binary Streams| R2
     end
+
+    subgraph Client ["💻 Client-Side Rendering Engine"]
+        App["📱 StudyMate Responsive Shell"]
+        
+        subgraph Viewers ["📄 Document & Code Viewers"]
+            direction LR
+            PDF["📄 PDF.js"]
+            DOC["📝 Mammoth.js"]
+            CODE["💻 Highlight.js"]
+        end
+        
+        subgraph Studio ["🎨 Media & Creation Studio"]
+            direction LR
+            PLYR["🎵 Plyr Player"]
+            NOTE["✍️ Notepad Studio"]
+            SLIDE["🎭 Slide Theater"]
+        end
+
+        App --> Viewers
+        App --> Studio
+    end
+
+    Student -->|HTTPS / PWA| Worker
+    Admin -->|Passkey Auth| Worker
+    Worker -->|Edge HTML & Assets| App
 ```
+
+<details>
+<summary><b>📐 Text / ASCII Architecture Overview (Instant View)</b></summary>
+
+```text
+                  ┌───────────────────────┐       ┌───────────────────────┐
+                  │ 👨‍🎓 Student / Visitor │       │  👨‍🏫 Administrator   │
+                  └───────────┬───────────┘       └───────────┬───────────┘
+                              │ HTTPS / PWA                   │ Passkey Auth
+                              └───────────────┬───────────────┘
+                                              ▼
+                    ┌───────────────────────────────────────────────────┐
+                    │       🌐 Cloudflare Edge Worker Runtime          │
+                    │         • Router, Auth & Security                 │
+                    │         • Dynamic HTML & Asset Delivery           │
+                    └───────────┬───────────────────────────┬───────────┘
+                                │                           │
+               Metadata Queries │                           │ Binary Streams / Chunks
+                                ▼                           ▼
+              ┌───────────────────────────┐       ┌───────────────────────────┐
+              │    🗄️ Cloudflare KV       │       │    🪣 Cloudflare R2       │
+              │  • Fast Hierarchy Tree    │       │  • PDF / Docs / Media     │
+              │  • Tag Index & Metadata   │       │  • Zero-Egress Storage    │
+              └───────────────────────────┘       └───────────────────────────┘
+                                              │
+                                              │ Hydrate Client UI & PWA Cache
+                                              ▼
+                    ┌───────────────────────────────────────────────────┐
+                    │         📱 StudyMate Responsive App Shell         │
+                    │           (Vanilla JS, Glassmorphism UI)          │
+                    ├─────────────────────────────┬─────────────────────┤
+                    │   Document & Code Viewers   │   Media & Studio    │
+                    │   • PDF.js Reader           │   • Plyr Media      │
+                    │   • Mammoth.js (.docx)      │   • Notepad Studio  │
+                    │   • Highlight.js Code       │   • Slide Theater   │
+                    └─────────────────────────────┴─────────────────────┘
+```
+
+</details>
 
 ---
 
