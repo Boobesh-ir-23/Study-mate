@@ -8,7 +8,7 @@ const STATS_KEY = 'personal_lms_stats_v3';
 const BROADCASTS_KEY = 'current_notes_broadcasts_v2';
 const ACTIVE_BROADCAST_KEY = 'current_notes_active_broadcast_v2';
 const SUBSCRIBERS_COUNT_KEY = 'current_notes_subscribers_v2';
-const RATE_LIMIT_PREFIX = 'rl_v3_';
+const RATE_LIMIT_PREFIX = 'rl_v4_';
 const R2_FREE_TIER_BYTES = 10 * 1024 * 1024 * 1024; // 10 GB Free Tier
 
 // Helper: Standard security headers applied to all responses
@@ -105,6 +105,43 @@ async function isRateLimited(env, key, maxAttempts = 5, windowSeconds = 600) {
     return false;
   } catch (e) {
     return false;
+  }
+}
+
+async function checkRateLimit(env, key, maxAttempts = 10) {
+  if (!env.FILES_DB) return false;
+  if (key.includes('127.0.0.1') || key.includes('::1') || key.includes('unknown') || env.ENVIRONMENT === 'development') {
+    return false;
+  }
+  try {
+    const fullKey = `${RATE_LIMIT_PREFIX}${key}`;
+    const raw = await env.FILES_DB.get(fullKey);
+    const count = raw ? parseInt(raw, 10) : 0;
+    return count >= maxAttempts;
+  } catch (e) {
+    return false;
+  }
+}
+
+async function recordFailedAttempt(env, key, windowSeconds = 300) {
+  if (!env.FILES_DB) return;
+  try {
+    const fullKey = `${RATE_LIMIT_PREFIX}${key}`;
+    const raw = await env.FILES_DB.get(fullKey);
+    const count = raw ? parseInt(raw, 10) : 0;
+    await env.FILES_DB.put(fullKey, (count + 1).toString(), { expirationTtl: windowSeconds });
+  } catch (e) {
+    // Non-critical
+  }
+}
+
+async function resetRateLimit(env, key) {
+  if (!env.FILES_DB) return;
+  try {
+    const fullKey = `${RATE_LIMIT_PREFIX}${key}`;
+    await env.FILES_DB.delete(fullKey);
+  } catch (e) {
+    // Non-critical
   }
 }
 
@@ -242,8 +279,9 @@ export default {
 
     // 4. Admin Auth: Login
     if (url.pathname === '/api/auth/login' && method === 'POST') {
-      if (await isRateLimited(env, `auth_${clientIp}`, 5, 600)) {
-        return jsonResponse({ success: false, error: 'Too many failed login attempts. Please wait 10 minutes.' }, 429);
+      const rlKey = `auth_${clientIp}`;
+      if (await checkRateLimit(env, rlKey, 10)) {
+        return jsonResponse({ success: false, error: 'Too many failed login attempts. Please wait 5 minutes.' }, 429);
       }
 
       try {
@@ -252,6 +290,7 @@ export default {
         const configured = (env.ADMIN_PASSWORD || '').trim() || 'admin';
 
         if (entered && entered === configured) {
+          await resetRateLimit(env, rlKey);
           const token = await createHmacToken(configured, {
             role: 'admin',
             iat: Date.now(),
@@ -260,6 +299,7 @@ export default {
           return jsonResponse({ success: true, token, role: 'admin' });
         }
 
+        await recordFailedAttempt(env, rlKey, 300);
         return jsonResponse({ success: false, error: 'Invalid admin password' }, 401);
       } catch (e) {
         return jsonResponse({ success: false, error: 'Invalid request payload' }, 400);
