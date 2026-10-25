@@ -18,6 +18,9 @@ preview_id = "your-kv-preview-id"
 # bucket_name = "personal-lms-files"
 # preview_bucket_name = "personal-lms-files-preview"
 
+# Preserve variables & secrets configured in Cloudflare Dashboard
+keep_vars = true
+
 # Default environment variables (Non-sensitive)
 [vars]
 ENVIRONMENT = "production"
