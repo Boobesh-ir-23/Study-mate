@@ -71,100 +71,150 @@ cd Study-mate
 npm install
 ```
 
-### 3. Configure Local Environment
+## ⚙️ Environment Variables & Secrets Reference
 
-Copy or modify `wrangler.toml` with your desired configuration:
+Configure these in the Cloudflare Dashboard under **Workers & Pages > studymate > Settings > Variables and Secrets** (or in GitHub Secrets for CI/CD):
 
-```toml
-name = "study-mate"
-main = "worker.js"
-compatibility_date = "2024-01-01"
+| Variable / Secret | Type | Location | Required? | Description |
+|---|---|---|:---:|---|
+| `ADMIN_PASSWORD` | **Secret** | Cloudflare Dashboard | **Yes** | Master password for admin portal access (`Ctrl + Shift + A`). Stored as an encrypted secret. |
+| `CLOUDFLARE_ACCOUNT_ID` | **Secret** | GitHub Repo Secrets | **Yes (CI/CD)** | Your 32-character Cloudflare Account ID (found on Cloudflare dashboard right sidebar). |
+| `CLOUDFLARE_API_TOKEN` | **Secret** | GitHub Repo Secrets | **Yes (CI/CD)** | API token created with `Edit Cloudflare Workers` template. |
+| `CLOUDFLARE_KV_ID` | **Secret** | GitHub Repo Secrets | **Yes (CI/CD)** | The KV Namespace ID for `FILES_DB` where file hierarchies, suggestions, and notes reside. |
+| `WEB3FORMS_ACCESS_KEY` | **Secret** | Cloudflare Dashboard | Optional | Access key from [Web3Forms](https://web3forms.com) to receive student material suggestions in your email inbox. |
+| `TELEGRAM_BOT_TOKEN` | **Secret** | Cloudflare Dashboard | Optional | Bot token from `@BotFather` for instant mobile alerts on new suggestions. |
+| `TELEGRAM_CHAT_ID` | **Secret** | Cloudflare Dashboard | Optional | Your Telegram user/channel ID to receive alert messages. |
+| `DISCORD_WEBHOOK_URL` | **Secret** | Cloudflare Dashboard | Optional | Discord channel webhook URL for real-time submission alerts. |
+| `DEFAULT_THEME` | **Variable** | `wrangler.toml` / Dashboard | Optional | Initial color theme: `dark` (default) or `light`. |
+| `ENVIRONMENT` | **Variable** | `wrangler.toml` / Dashboard | Optional | Environment mode: `production` or `development`. |
 
-[vars]
-ENVIRONMENT = "development"
-ADMIN_PASSWORD = "admin" # Set your secure admin password
-VISITOR_PASSWORD = ""    # Optional visitor passcode
+> [!TIP]
+> Always add sensitive credentials (like `ADMIN_PASSWORD` and `WEB3FORMS_ACCESS_KEY`) as **Type: Secret (Encrypted)** in Cloudflare so they are never overwritten during redeployments.
 
-[[kv_namespaces]]
-binding = "LMS_KV"
-id = "YOUR_KV_NAMESPACE_ID"
-preview_id = "YOUR_KV_PREVIEW_ID"
+---
 
-[[r2_buckets]]
-binding = "LMS_BUCKET"
-bucket_name = "study-mate-storage"
-```
+## 🚀 Quickstart & Local Development
 
-### 4. Build Bundles & Start Dev Server
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) v18.0.0 or higher
+- [npm](https://www.npmjs.com/) v9.0.0 or higher
+
+### 1. Clone the Repository
 
 ```bash
-# Compile index.html and sw.js into inlined edge assets
+git clone https://github.com/hariharanboss/Study-mate.git
+cd Study-mate
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Build & Run Locally
+
+```bash
+# Compile HTML and Service Worker into inlined edge assets
 node build.js
 
-# Launch the local Wrangler development server
+# Launch local development server with simulated KV
 npm run dev
 ```
 
-Visit `http://localhost:8787` in your browser.
+Open `http://localhost:8787` in your browser.
 
 ---
 
 ## ☁️ Production Deployment
 
-Deploying StudyMate to Cloudflare takes less than 3 minutes:
+Choose either the **Zero-CLI GitHub Actions workflow** (easiest for forks) or the **Wrangler CLI method**:
 
-### 1. Log in to Cloudflare
+### Method 1: Automatic CI/CD with GitHub Actions (Recommended)
+
+Every push to your `main` branch will automatically build and deploy the application to Cloudflare Workers in under 30 seconds.
+
+#### Step 1: Fork & Clone
+Fork this repository to your GitHub account.
+
+#### Step 2: Create Cloudflare KV Database
+1. Go to the [Cloudflare Dashboard](https://dash.cloudflare.com/) > **Workers & Pages** > **KV**.
+2. Click **Create Namespace**, name it `study_mate_files`, and click **Add**.
+3. Copy the generated **Namespace ID**.
+
+#### Step 3: Configure GitHub Repository Secrets
+In your GitHub repository, navigate to **Settings > Secrets and variables > Actions** and click **New repository secret**:
+
+| Secret Name | Value |
+|---|---|
+| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare Account ID (from dashboard sidebar) |
+| `CLOUDFLARE_API_TOKEN` | Your Cloudflare API Token ([Create Token](https://dash.cloudflare.com/profile/api-tokens) using `Edit Cloudflare Workers` template) |
+| `CLOUDFLARE_KV_ID` | The KV Namespace ID copied in Step 2 |
+
+#### Step 4: Set Admin Password & Web3Forms in Cloudflare
+Once deployed, go to **Cloudflare Dashboard > Workers & Pages > studymate > Settings > Variables and Secrets**:
+1. Click **+ Add variable** -> select **Type: Secret (Encrypted)**.
+2. Name: `ADMIN_PASSWORD` | Value: *Your secret password*.
+3. (Optional) Name: `WEB3FORMS_ACCESS_KEY` | Value: *Your Web3Forms key*.
+4. Click **Deploy**.
+
+Done! Your LMS is live at `https://studymate.<your-subdomain>.workers.dev`.
+
+---
+
+### Method 2: Manual CLI Deployment with Wrangler
+
+If you prefer deploying directly from your terminal:
 
 ```bash
+# 1. Log in to Cloudflare
 npx wrangler login
-```
 
-### 2. Create the KV Namespace
+# 2. Create the KV Namespace
+npx wrangler kv namespace create FILES_DB
 
-```bash
-npx wrangler kv:namespace create "LMS_KV"
-```
+# 3. Add the generated KV ID into wrangler.toml:
+# [[kv_namespaces]]
+# binding = "FILES_DB"
+# id = "<YOUR_KV_NAMESPACE_ID>"
 
-Copy the returned `id` and paste it into your `wrangler.toml` under `[[kv_namespaces]]`.
+# 4. Set your Admin Password
+npx wrangler secret put ADMIN_PASSWORD
 
-### 3. Create the R2 Storage Bucket
+# 5. (Optional) Set Web3Forms Access Key
+npx wrangler secret put WEB3FORMS_ACCESS_KEY
 
-```bash
-npx wrangler r2 bucket create study-mate-storage
-```
+# 6. (Optional) Create R2 Storage Bucket
+npx wrangler r2 bucket create personal-lms-files
 
-Ensure the bucket name matches the `bucket_name` in `wrangler.toml`.
-
-### 4. Compile and Deploy
-
-```bash
-# Build the production bundle
+# 7. Compile assets and deploy
 node build.js
-
-# Deploy to Cloudflare Workers edge network
-npx wrangler deploy
+npx wrangler deploy --keep-vars
 ```
-
-Your learning portal will immediately be live on your custom `*.workers.dev` subdomain!
 
 ---
 
 ## 📋 API & Edge Endpoints
 
 | Method | Endpoint | Access | Description |
-|---|---|---|---|
-| `GET` | `/` | Public | Serves the single-page responsive web client |
-| `GET` | `/api/fs` | Public | Retrieves the virtual file system tree and hierarchy |
-| `POST` | `/api/admin/login` | Public | Verifies admin credentials and issues a secure session token |
-| `POST` | `/api/admin/upload` | Admin | Uploads files and registers metadata into KV and R2 |
-| `POST` | `/api/admin/folder` | Admin | Creates a new subject or subfolder directory |
-| `DELETE` | `/api/admin/item` | Admin | Soft-deletes a file or directory into the Recycle Bin |
-| `GET` | `/api/admin/trash` | Admin | Fetches deleted items currently in the Recycle Bin |
-| `POST` | `/api/admin/restore` | Admin | Restores a deleted item back to its original folder |
-| `DELETE` | `/api/admin/purge` | Admin | Permanently erases an item from the Recycle Bin |
-| `GET` | `/api/admin/analytics` | Admin | Summarizes storage quota, total files, and folder count |
-| `POST` | `/api/admin/broadcast` | Admin | Publishes a top-bar banner alert or announcement |
-| `POST` | `/api/admin/notes` | Admin | Stores or updates sticky note canvas items |
+|---|---|:---:|---|
+| `GET` | `/` | Public | Serves the single-page progressive web application (PWA) |
+| `GET` | `/api/config` | Public | Returns edge configuration, theme settings, and active feature flags |
+| `GET` | `/api/fs` | Public | Retrieves the virtual file system tree and resource catalog |
+| `POST` | `/api/auth/login` | Public | Verifies admin credentials and issues a signed HMAC-SHA256 session token |
+| `GET` | `/api/auth/check` | Public | Validates session token state and confirms active admin privileges |
+| `POST` | `/api/fs/update` | **Admin** | Atomically updates folders, resource links, and study notes hierarchy |
+| `POST` | `/api/files/upload` | **Admin** | Uploads binary files (PDF, DOCX, PPTX) to Cloudflare R2 / KV storage |
+| `GET` | `/api/files/download/:key` | Public | Streams stored binary documents with edge CDN caching |
+| `POST` | `/api/suggest` | Public | Allows students to suggest materials (rate-limited, sends email/chat alerts) |
+| `GET` | `/api/suggestions` | **Admin** | Fetches the student material suggestions review queue |
+| `POST` | `/api/suggestions/:id/action` | **Admin** | Approves or rejects a student submission |
+| `GET` | `/api/admin/analytics` | **Admin** | Aggregates storage quotas, file metrics, and student traffic insights |
+| `POST` | `/api/notifications/subscribe` | Public | Subscribes student browsers to Web Push notifications |
+| `GET` | `/api/broadcasts/latest` | Public | Retrieves current campus announcement or emergency banner |
+| `POST` | `/api/admin/broadcast/send` | **Admin** | Publishes a real-time announcement banner to all students |
+| `POST` | `/api/admin/broadcast/cancel/:id` | **Admin** | Dismisses and archives an active announcement banner |
 
 ---
 
