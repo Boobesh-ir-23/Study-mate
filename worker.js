@@ -532,6 +532,56 @@ export default {
           }
         }
 
+        // Telegram Bot Instant Alert (Optional)
+        if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
+          try {
+            const tgMsg = `📚 *New StudyMate Resource Suggestion!*\n\n` +
+              `👤 *Student:* ${suggestion.studentName}\n` +
+              `📖 *Subject:* ${suggestion.subject} (${suggestion.section})\n` +
+              `📌 *Topic:* ${suggestion.topic || 'General'}\n` +
+              `🔗 *Link:* ${suggestion.resourceLink || 'None provided'}\n` +
+              `📝 *Note:* ${suggestion.note || 'None'}\n` +
+              `⏰ *Time:* ${new Date(suggestion.submittedAt).toLocaleString()}`;
+            await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: env.TELEGRAM_CHAT_ID,
+                text: tgMsg,
+                parse_mode: 'Markdown'
+              })
+            });
+          } catch (e) {
+            console.error('Telegram notification error:', e);
+          }
+        }
+
+        // Discord Webhook Alert (Optional)
+        if (env.DISCORD_WEBHOOK_URL) {
+          try {
+            await fetch(env.DISCORD_WEBHOOK_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                username: 'StudyMate Alerts',
+                embeds: [{
+                  title: `📚 New Resource Suggestion: ${subject} (${section})`,
+                  color: 0x3b82f6,
+                  fields: [
+                    { name: 'Student', value: suggestion.studentName, inline: true },
+                    { name: 'Topic', value: suggestion.topic || 'General', inline: true },
+                    { name: 'Link', value: suggestion.resourceLink || 'None provided', inline: false },
+                    { name: 'Note', value: suggestion.note || 'None', inline: false }
+                  ],
+                  timestamp: suggestion.submittedAt
+                }]
+              })
+            });
+          } catch (e) {
+            console.error('Discord notification error:', e);
+          }
+        }
+
         return jsonResponse({
           success: true,
           message: 'Thank you! Your resource has been submitted to the admin for review.',
