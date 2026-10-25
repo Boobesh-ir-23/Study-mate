@@ -5542,11 +5542,7 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
       <i data-lucide="copy"></i>
       <span>Copy Link</span>
     </button>
-    <button class="context-menu-item" id="ctx-admin-login-prompt" style="display:none; color:var(--accent-primary);">
-      <i data-lucide="shield"></i>
-      <span>Admin Controls</span>
-    </button>
-    <div class="context-menu-divider"></div>
+    <div class="context-menu-divider" id="ctx-admin-divider" style="display:none;"></div>
     <button class="context-menu-item" id="ctx-folder-upload" style="display:none;">
       <i data-lucide="upload-cloud" class="lucide-icon" style="color:var(--accent-primary);"></i>
       <span>Upload files here</span>
@@ -5572,7 +5568,7 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
       <i data-lucide="sliders"></i>
       <span>Edit Details</span>
     </button>
-    <div class="context-menu-divider"></div>
+    <div class="context-menu-divider" id="ctx-delete-divider" style="display:none;"></div>
     <button class="context-menu-item danger" id="ctx-delete" style="display:none;">
       <i data-lucide="trash-2"></i>
       <span>Delete</span>
@@ -10572,6 +10568,11 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
           ctxFolderUpload.style.display = (state.isAdmin && isFolder) ? 'flex' : 'none';
         }
 
+        const ctxFolderUploadFolder = document.getElementById('ctx-folder-upload-folder');
+        if (ctxFolderUploadFolder) {
+          ctxFolderUploadFolder.style.display = (state.isAdmin && isFolder) ? 'flex' : 'none';
+        }
+
         // Manage Tags (Admin only)
         const ctxManageTags = document.getElementById('ctx-manage-tags');
         if (ctxManageTags) {
@@ -10596,16 +10597,22 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
           ctxEdit.style.display = state.isAdmin ? 'flex' : 'none';
         }
 
+        // Admin divider before actions
+        const ctxAdminDivider = document.getElementById('ctx-admin-divider');
+        if (ctxAdminDivider) {
+          ctxAdminDivider.style.display = state.isAdmin ? 'block' : 'none';
+        }
+
+        // Delete divider & Delete button (Admin only)
+        const ctxDeleteDivider = document.getElementById('ctx-delete-divider');
+        if (ctxDeleteDivider) {
+          ctxDeleteDivider.style.display = state.isAdmin ? 'block' : 'none';
+        }
+
         // Delete (Admin only)
         const ctxDelete = document.getElementById('ctx-delete');
         if (ctxDelete) {
           ctxDelete.style.display = state.isAdmin ? 'flex' : 'none';
-        }
-
-        // Admin login prompt (Visible only when NOT admin)
-        const ctxLoginPrompt = document.getElementById('ctx-admin-login-prompt');
-        if (ctxLoginPrompt) {
-          ctxLoginPrompt.style.display = state.isAdmin ? 'none' : 'flex';
         }
 
         const openLabel = document.getElementById('ctx-open-label');
@@ -10663,20 +10670,12 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
       document.addEventListener('touchmove', () => clearTimeout(mobileLongPressTimer), { passive: true });
       document.addEventListener('touchend', () => clearTimeout(mobileLongPressTimer), { passive: true });
 
-      // Connect Manage Tags and Admin Login Prompt in context menu
+      // Connect Manage Tags in context menu
       const ctxManageTagsBtn = document.getElementById('ctx-manage-tags');
       if (ctxManageTagsBtn) {
         ctxManageTagsBtn.addEventListener('click', () => {
           hideContextMenus();
           if (state.contextMenuItemId) openTagModal(state.contextMenuItemId);
-        });
-      }
-
-      const ctxAdminLoginPrompt = document.getElementById('ctx-admin-login-prompt');
-      if (ctxAdminLoginPrompt) {
-        ctxAdminLoginPrompt.addEventListener('click', () => {
-          hideContextMenus();
-          openModal('modal-admin-login');
         });
       }
 
@@ -12571,17 +12570,9 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
             <span style="color:var(--text-main);">Toggle Details Drawer</span>
             <kbd class="card-tag">I</kbd>
           </div>
-          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="display:flex; justify-content:space-between; padding:6px 0;">
             <span style="color:var(--text-main);">Star / Favorite Selected</span>
             <kbd class="card-tag">S</kbd>
-          </div>
-          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-            <span style="color:var(--text-main);">Rename Item (Admin)</span>
-            <kbd class="card-tag">F2</kbd>
-          </div>
-          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-            <span style="color:var(--text-main);">Delete Item (Admin)</span>
-            <kbd class="card-tag">Delete</kbd>
           </div>
           <div style="display:flex; justify-content:space-between; padding:6px 0;">
             <span style="color:var(--text-main);">Show Shortcuts Help</span>
