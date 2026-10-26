@@ -4664,10 +4664,7 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
 
         <!-- Controls Toolbar (Clean & De-congested with Slide-Down Menu) -->
         <div class="drive-view-controls">
-          <button class="btn-glass crumb-back-btn" id="btn-crumb-back" title="Go back to parent folder" style="display:none; padding:6px 12px; font-size:0.82rem;">
-            <i data-lucide="arrow-left" style="width:14px; height:14px;"></i>
-            <span>Back</span>
-          </button>
+
 
           <select id="drive-sort-select" class="drive-sort-select" title="Sort items">
             <option value="name_asc">Name (A-Z)</option>
@@ -6427,11 +6424,7 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
         const path = buildPathToNode(state.fsTree, state.currentFolderId) || [{ id: 'root', name: 'Study Mate' }];
         state.currentPath = path;
 
-        // Update Back Button visibility in controls bar
-        const backBtn = document.getElementById('btn-crumb-back');
-        if (backBtn) {
-          backBtn.style.display = path.length > 1 ? 'inline-flex' : 'none';
-        }
+
 
         // Render Windows Explorer-Style Breadcrumbs Trail
         if (els.breadcrumbs) {
