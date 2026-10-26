@@ -7597,16 +7597,48 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
         }
 
         const card = e.target.closest('.explorer-card, .list-row');
+        if (!card) {
+          // Deselect when clicking empty space (Windows Explorer standard)
+          if (!e.target.closest('.folder-callouts-wrapper, button, input, select, textarea, a, .star-btn')) {
+            state.selectedItemId = null;
+            document.querySelectorAll('.explorer-card.selected, .list-row.selected').forEach(el => el.classList.remove('selected'));
+            if (els.infoDrawer) updateInfoDrawer();
+          }
+          return;
+        }
+
+        const itemId = card.dataset.id;
+        const item = findNodeById(state.fsTree, itemId);
+        if (!item) return;
+
+        // Select item on single click (Windows Explorer highlight)
+        selectItem(itemId);
+
+        // Mobile / Touch devices: Single tap opens immediately
+        const isTouchOrMobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+        if (isTouchOrMobile) {
+          if (item.type === 'folder') {
+            navigateToFolder(item.id);
+          } else {
+            openResourceItem(item);
+          }
+        }
+      });
+
+      // Desktop View: Double-click to open folder or launch file viewer (Windows 10/11 Explorer Standard)
+      els.explorerGrid.addEventListener('dblclick', (e) => {
+        // Prevent opening if double-clicking an action button
+        if (e.target.closest('button, .star-btn, .btn-card-more, .btn-item-rename, .btn-item-tag, .btn-item-delete')) {
+          return;
+        }
+
+        const card = e.target.closest('.explorer-card, .list-row');
         if (!card) return;
 
         const itemId = card.dataset.id;
         const item = findNodeById(state.fsTree, itemId);
         if (!item) return;
 
-        // Select item on click (Google Drive standard)
-        selectItem(itemId);
-
-        // Open directly on click
         if (item.type === 'folder') {
           navigateToFolder(item.id);
         } else {
