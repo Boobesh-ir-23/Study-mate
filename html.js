@@ -11738,7 +11738,12 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
         // Fallback to local storage (for offline or local drafting)
         try {
           const raw = localStorage.getItem(\`dept_lms_callouts_\${folderId}\`);
-          if (raw) return JSON.parse(raw);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              return parsed.filter(c => c.id !== 'callout-root-guide' && c.id !== 'callout-root-note');
+            }
+          }
         } catch (e) {}
 
         return [];
@@ -12159,6 +12164,13 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
       }
 
       async function init() {
+        // Purge legacy mock banners from localStorage if present
+        try {
+          const legacyRoot = localStorage.getItem('dept_lms_callouts_root');
+          if (legacyRoot && (legacyRoot.includes('callout-root-guide') || legacyRoot.includes('callout-root-note') || legacyRoot.includes('Department LMS'))) {
+            localStorage.removeItem('dept_lms_callouts_root');
+          }
+        } catch (e) {}
         setTheme(state.activeTheme);
 
         try {
