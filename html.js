@@ -4750,6 +4750,9 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
     <!-- Active Category Filter Banner -->
     <div id="filter-status-container"></div>
 
+    <!-- Liquid Breadcrumb Navigation Bar (Windows Explorer Style) -->
+    <nav class="breadcrumbs-bar" id="breadcrumbs-container" style="display:none; margin-bottom:16px;"></nav>
+
     <!-- Main Explorer Grid (Folders & Study Materials) -->
     <main class="items-grid" id="explorer-grid">
       <!-- Dynamically populated items -->
@@ -6430,27 +6433,33 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
           backBtn.style.display = path.length > 1 ? 'inline-flex' : 'none';
         }
 
-        // If breadcrumbs element exists in DOM, render
+        // Render Windows Explorer-Style Breadcrumbs Trail
         if (els.breadcrumbs) {
-          const backBtnHtml = path.length > 1 ? \`
-            <button class="crumb-back-btn" id="btn-crumb-back" title="Go back to previous folder (Backspace)">
-              <i data-lucide="arrow-left" style="width:13px; height:13px;"></i>
-              <span>Back</span>
-            </button>
-          \` : '';
-
-          const crumbsHtml = path.map((crumb, idx) => {
-            const isLast = idx === path.length - 1;
-            return \`
-              <span class="crumb-item \${isLast ? 'current' : ''}" data-id="\${crumb.id}">
-                \${idx === 0 ? '<i data-lucide="home" class="lucide-icon" style="width:15px; height:15px;"></i>' : ''}
-                <span>\${crumb.name}</span>
-              </span>
-              \${!isLast ? '<span class="crumb-divider"><i data-lucide="chevron-right" style="width:14px; height:14px;"></i></span>' : ''}
+          if (path.length <= 1) {
+            els.breadcrumbs.style.display = 'none';
+            els.breadcrumbs.innerHTML = '';
+          } else {
+            els.breadcrumbs.style.display = 'flex';
+            const backBtnHtml = \`
+              <button class="crumb-back-btn" id="btn-crumb-back" title="Go back to previous folder (Backspace)">
+                <i data-lucide="arrow-left" style="width:13px; height:13px;"></i>
+                <span>Back</span>
+              </button>
             \`;
-          }).join('');
 
-          els.breadcrumbs.innerHTML = backBtnHtml + crumbsHtml;
+            const crumbsHtml = path.map((crumb, idx) => {
+              const isLast = idx === path.length - 1;
+              return \`
+                <span class="crumb-item \${isLast ? 'current' : ''}" data-id="\${crumb.id}">
+                  \${idx === 0 ? '<i data-lucide="home" class="lucide-icon" style="width:15px; height:15px;"></i>' : ''}
+                  <span>\${crumb.name}</span>
+                </span>
+                \${!isLast ? '<span class="crumb-divider"><i data-lucide="chevron-right" style="width:14px; height:14px;"></i></span>' : ''}
+              \`;
+            }).join('');
+
+            els.breadcrumbs.innerHTML = backBtnHtml + crumbsHtml;
+          }
         }
 
         refreshIcons();
@@ -11691,46 +11700,43 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
       }
 
       function getFolderCallouts(folderId) {
+        let folder = null;
+        if (folderId === 'root') {
+          folder = state.fsTree;
+        } else if (state.fsTree) {
+          folder = findNodeById(state.fsTree, folderId);
+        }
+        if (folder && Array.isArray(folder.callouts)) {
+          return folder.callouts;
+        }
+
+        // Fallback to local storage (for offline or local drafting)
         try {
           const raw = localStorage.getItem(\`dept_lms_callouts_\${folderId}\`);
           if (raw) return JSON.parse(raw);
         } catch (e) {}
 
-        if (folderId === 'root') {
-          return [
-            {
-              id: 'callout-root-guide',
-              preset: 'guide',
-              badge: 'GUIDE',
-              title: 'Department LMS & Study Resources Hub',
-              icon: 'lightbulb',
-              color: '#10b981',
-              rgb: '16, 185, 129',
-              font: 'sans',
-              collapsed: false,
-              content: 'Welcome to the Central Academic Repository. Select your semester or department folder above to access verified lecture notes, question banks, and lab manuals.\\n• Use the search bar (or Ctrl + K) to locate subjects across all semesters.\\n• Press V to toggle between Grid and List view, and ? to view all keyboard shortcuts.'
-            },
-            {
-              id: 'callout-root-note',
-              preset: 'note',
-              badge: 'NOTE',
-              title: 'Exam Preparation & Repeated 16-Mark Questions',
-              icon: 'file-text',
-              color: '#3b82f6',
-              rgb: '59, 130, 246',
-              font: 'sans',
-              collapsed: false,
-              content: 'Semester 1 & 2 handwritten staff notes and solved model papers have been updated with unit-wise bookmarks. If you have missing reference documents or previous year question papers, submit them using the Suggest button.'
-            }
-          ];
-        }
-        return null;
+        return [];
       }
 
-      function saveFolderCallouts(folderId, callouts) {
+      async function saveFolderCallouts(folderId, callouts) {
+        let folder = null;
+        if (folderId === 'root') {
+          folder = state.fsTree;
+        } else if (state.fsTree) {
+          folder = findNodeById(state.fsTree, folderId);
+        }
+        if (folder) {
+          folder.callouts = callouts;
+        }
+
         try {
           localStorage.setItem(\`dept_lms_callouts_\${folderId}\`, JSON.stringify(callouts));
         } catch (e) {}
+
+        if (state.isAdmin) {
+          await syncTreeToBackend();
+        }
       }
 
       function renderFolderCalloutsHtml(currentFolder) {
@@ -12023,7 +12029,7 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
         // Save Button
         const saveBtn = document.getElementById('btn-callout-save');
         if (saveBtn) {
-          saveBtn.addEventListener('click', () => {
+          saveBtn.addEventListener('click', async () => {
             let callouts = getFolderCallouts(editingCallout.folderId) || [];
             if (editingCallout.id) {
               const idx = callouts.findIndex(c => c.id === editingCallout.id);
@@ -12036,24 +12042,24 @@ export const HTML_TEMPLATE = `<!DOCTYPE html>
               editingCallout.id = 'callout-' + Date.now();
               callouts.push({ ...editingCallout });
             }
-            saveFolderCallouts(editingCallout.folderId, callouts);
+            await saveFolderCallouts(editingCallout.folderId, callouts);
             closeModal('modal-callout-customizer');
             renderExplorerGrid();
-            showToast('Folder Guide & Notice saved!', 'success');
+            showToast('Folder Guide & Notice saved and synced to cloud!', 'success');
           });
         }
 
         // Delete Button
         const delBtn = document.getElementById('btn-callout-delete');
         if (delBtn) {
-          delBtn.addEventListener('click', () => {
+          delBtn.addEventListener('click', async () => {
             if (!editingCallout.id) return;
             let callouts = getFolderCallouts(editingCallout.folderId) || [];
             callouts = callouts.filter(c => c.id !== editingCallout.id);
-            saveFolderCallouts(editingCallout.folderId, callouts);
+            await saveFolderCallouts(editingCallout.folderId, callouts);
             closeModal('modal-callout-customizer');
             renderExplorerGrid();
-            showToast('Note deleted', 'info');
+            showToast('Note deleted and synced!', 'info');
           });
         }
       }
