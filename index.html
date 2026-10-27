@@ -3477,6 +3477,25 @@
       transform: translateY(-4px) scale(1.02);
       transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease;
     }
+    .crumb-back-btn.drag-over-crumb {
+      background: rgba(59, 130, 246, 0.3) !important;
+      border: 1px solid #3b82f6 !important;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.45);
+      border-radius: var(--radius-sm);
+      transform: scale(1.05);
+      transition: all 0.15s ease;
+    }
+    .explorer-card.is-cut,
+    .list-row.is-cut {
+      opacity: 0.42 !important;
+      filter: grayscale(35%) !important;
+      border: 1.5px dashed var(--accent-primary) !important;
+      transition: opacity 0.2s ease, border-color 0.2s ease;
+    }
+    .list-row.drag-over-folder {
+      border: 2px solid #3b82f6 !important;
+      background: rgba(59, 130, 246, 0.22) !important;
+    }
     .crumb-item.drag-over-crumb {
       background: rgba(59, 130, 246, 0.3) !important;
       border: 1px solid #3b82f6 !important;
@@ -5542,6 +5561,21 @@
       <span>Copy Link</span>
     </button>
     <div class="context-menu-divider" id="ctx-admin-divider" style="display:none;"></div>
+    <button class="context-menu-item" id="ctx-cut" style="display:none;">
+      <i data-lucide="scissors"></i>
+      <span>Cut</span>
+      <span class="context-menu-shortcut">Ctrl+X</span>
+    </button>
+    <button class="context-menu-item" id="ctx-copy" style="display:none;">
+      <i data-lucide="copy"></i>
+      <span>Copy</span>
+      <span class="context-menu-shortcut">Ctrl+C</span>
+    </button>
+    <button class="context-menu-item" id="ctx-paste-into" style="display:none;">
+      <i data-lucide="clipboard"></i>
+      <span id="ctx-paste-into-label">Paste into folder</span>
+      <span class="context-menu-shortcut">Ctrl+V</span>
+    </button>
     <button class="context-menu-item" id="ctx-folder-upload" style="display:none;">
       <i data-lucide="upload-cloud" class="lucide-icon" style="color:var(--accent-primary);"></i>
       <span>Upload files here</span>
@@ -5600,6 +5634,20 @@
     <button class="context-menu-item" id="ctx-bg-add-note">
       <i data-lucide="sticky-note"></i>
       <span>Add Sticky Note</span>
+    </button>
+    <button class="context-menu-item" id="ctx-bg-paste" style="display:none;">
+      <i data-lucide="clipboard"></i>
+      <span id="ctx-bg-paste-label">Paste</span>
+      <span class="context-menu-shortcut">Ctrl+V</span>
+    </button>
+    <button class="context-menu-item" id="ctx-bg-move-current" style="display:none;">
+      <i data-lucide="folder-symlink"></i>
+      <span>Move current folder to...</span>
+    </button>
+    <button class="context-menu-item" id="ctx-bg-cut-current" style="display:none;">
+      <i data-lucide="scissors"></i>
+      <span>Cut current folder</span>
+      <span class="context-menu-shortcut">Ctrl+X</span>
     </button>
     <div class="context-menu-divider"></div>
     <button class="context-menu-item" id="ctx-bg-dashboard">
@@ -6266,7 +6314,8 @@
         viewMode: localStorage.getItem('study_mate_view_mode') || 'grid',
         sortBy: localStorage.getItem('study_mate_sort_by') || 'name_asc',
         starredIds: new Set(initialStarred),
-        selectedItemId: null
+        selectedItemId: null,
+        clipboard: null
       };
 
       // Refresh Lucide Icons Helper
@@ -6451,6 +6500,54 @@
             }).join('');
 
             els.breadcrumbs.innerHTML = backBtnHtml + crumbsHtml;
+
+            // Fluid drag-and-drop targeting on breadcrumbs to move entire folders or files up the hierarchy
+            if (state.isAdmin) {
+              els.breadcrumbs.querySelectorAll('.crumb-item:not(.current)').forEach(crumbEl => {
+                const targetId = crumbEl.dataset.id;
+                crumbEl.addEventListener('dragover', (e) => {
+                  if (state.draggedItemId && state.draggedItemId !== targetId && !isDescendant(state.draggedItemId, targetId)) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    crumbEl.classList.add('drag-over-crumb');
+                  }
+                });
+                crumbEl.addEventListener('dragleave', () => {
+                  crumbEl.classList.remove('drag-over-crumb');
+                });
+                crumbEl.addEventListener('drop', (e) => {
+                  e.preventDefault();
+                  crumbEl.classList.remove('drag-over-crumb');
+                  const draggedId = e.dataTransfer.getData('text/plain') || state.draggedItemId;
+                  if (draggedId && targetId && draggedId !== targetId && !isDescendant(draggedId, targetId)) {
+                    moveItem(draggedId, targetId);
+                  }
+                });
+              });
+
+              const backBtn = els.breadcrumbs.querySelector('#btn-crumb-back');
+              if (backBtn && path.length > 1) {
+                const parentCrumb = path[path.length - 2];
+                backBtn.addEventListener('dragover', (e) => {
+                  if (state.draggedItemId && !isDescendant(state.draggedItemId, parentCrumb.id)) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    backBtn.classList.add('drag-over-crumb');
+                  }
+                });
+                backBtn.addEventListener('dragleave', () => {
+                  backBtn.classList.remove('drag-over-crumb');
+                });
+                backBtn.addEventListener('drop', (e) => {
+                  e.preventDefault();
+                  backBtn.classList.remove('drag-over-crumb');
+                  const draggedId = e.dataTransfer.getData('text/plain') || state.draggedItemId;
+                  if (draggedId && !isDescendant(draggedId, parentCrumb.id)) {
+                    moveItem(draggedId, parentCrumb.id);
+                  }
+                });
+              }
+            }
           }
         }
 
@@ -6962,6 +7059,7 @@
           const isStarred = state.starredIds.has(item.id);
           const isSelected = state.selectedItemId === item.id;
           const isDraggable = state.isAdmin ? 'draggable="true"' : 'draggable="false"';
+          const isCut = (state.clipboard && state.clipboard.action === 'cut' && state.clipboard.itemId === item.id) ? 'is-cut' : '';
 
           const fileInfo = getFileTypeInfo(item);
           let iconName = fileInfo.icon;
@@ -6971,7 +7069,7 @@
           const categoryText = isFolder ? 'Folder' : (FILTER_LABELS[item.category] || item.category || 'General');
 
           return `
-            <div class="list-row ${isSelected ? 'selected' : ''}" data-id="${item.id}" data-type="${item.type}" ${isDraggable} tabindex="0">
+            <div class="list-row ${isSelected ? 'selected' : ''} ${isCut}" data-id="${item.id}" data-type="${item.type}" ${isDraggable} tabindex="0">
               <button class="star-btn ${isStarred ? 'starred' : ''}" data-star-id="${item.id}" title="${isStarred ? 'Remove Star' : 'Star this item'}">
                 <i data-lucide="star" style="width:14px; height:14px;"></i>
               </button>
@@ -7017,6 +7115,7 @@
           const lucideName = fileInfo.icon;
           const isSelected = state.selectedItemIds.has(item.id);
           const isDraggable = state.isAdmin ? 'draggable="true"' : 'draggable="false"';
+          const isCut = (state.clipboard && state.clipboard.action === 'cut' && state.clipboard.itemId === item.id) ? 'is-cut' : '';
 
           // FOLDER CARD: Centered card info with dynamic size adaptation
           if (isFolder) {
@@ -7259,7 +7358,7 @@
 
         // Admin Drag-and-Drop Handlers for Cards and Rows (Google Drive style fluid drag & drop)
         if (state.isAdmin) {
-          els.explorerGrid.querySelectorAll('.explorer-card').forEach(card => {
+          els.explorerGrid.querySelectorAll('.explorer-card, .list-row').forEach(card => {
             const itemId = card.dataset.id;
             const itemType = card.dataset.type;
 
@@ -8342,6 +8441,53 @@
         if ((e.key === 's' || e.key === 'S') && state.selectedItemId) {
           toggleItemStar(state.selectedItemId);
           return;
+        }
+
+        // Ctrl+C / Cmd+C -> Copy selected item
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C') && !e.shiftKey) {
+          const targetId = state.selectedItemId || (state.selectedItemIds && state.selectedItemIds.size > 0 ? Array.from(state.selectedItemIds)[0] : null);
+          if (targetId) {
+            e.preventDefault();
+            handleCopyItem(targetId);
+            return;
+          }
+        }
+
+        // Ctrl+X / Cmd+X -> Cut selected item (or current folder)
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'x' || e.key === 'X')) {
+          const targetId = state.selectedItemId || (state.selectedItemIds && state.selectedItemIds.size > 0 ? Array.from(state.selectedItemIds)[0] : null);
+          if (targetId) {
+            e.preventDefault();
+            handleCutItem(targetId);
+            return;
+          } else if (state.currentFolderId !== 'root') {
+            e.preventDefault();
+            handleCutItem(state.currentFolderId);
+            return;
+          }
+        }
+
+        // Ctrl+V / Cmd+V -> Paste item into current or selected folder
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'v' || e.key === 'V')) {
+          if (state.clipboard && state.clipboard.itemId) {
+            e.preventDefault();
+            let destId = state.currentFolderId;
+            if (state.selectedItemId && state.selectedItemId !== state.clipboard.itemId) {
+              const sel = findNodeById(state.fsTree, state.selectedItemId);
+              if (sel && sel.type === 'folder') destId = sel.id;
+            }
+            handlePasteInto(destId);
+            return;
+          }
+        }
+
+        // Escape -> Cancel cut state if active
+        if (e.key === 'Escape') {
+          if (state.clipboard && state.clipboard.action === 'cut') {
+            state.clipboard = null;
+            updateCutVisuals();
+            showToast('Cut cancelled', 'info');
+          }
         }
 
         // F2 -> Rename selected item (Admin)
@@ -9545,8 +9691,182 @@
       // GOOGLE DRIVE SUITE: RIGHT-CLICK CONTEXT MENU, DRAG & DROP, RENAME & MOVE
       // ==========================================================================
 
-      // Move Item into Destination Folder (Used by Drag-and-Drop and Move-To Modal)
+      // Move Item into Destination Folder (Used by Drag-and-Drop, Move-To Modal, and Cut/Paste)
       function moveItem(itemId, destinationFolderId) {
+        if (!state.isAdmin) {
+          showToast('Admin login required to move items', 'error');
+          openModal('modal-admin-login');
+          return;
+        }
+        if (itemId === destinationFolderId) return;
+        if (isDescendant(itemId, destinationFolderId)) {
+          showToast('Cannot move a folder into its own subfolder', 'error');
+          return;
+        }
+
+        const item = findNodeById(state.fsTree, itemId);
+        const destFolder = findNodeById(state.fsTree, destinationFolderId);
+        if (!item || !destFolder) {
+          showToast('Target destination not found', 'error');
+          return;
+        }
+
+        const sourceParent = findParentNode(state.fsTree, itemId);
+        if (!sourceParent) {
+          showToast('Cannot move root directory', 'error');
+          return;
+        }
+
+        // If already in that folder, nothing to do
+        if (sourceParent.id === destFolder.id) return;
+
+        // 1. Remove from source
+        sourceParent.children = sourceParent.children.filter(c => c.id !== itemId);
+
+        // 2. Add to destination
+        if (!destFolder.children) destFolder.children = [];
+        destFolder.children.push(item);
+
+        // 3. Clear cut visuals if this item was cut
+        if (state.clipboard && state.clipboard.itemId === itemId) {
+          state.clipboard = null;
+          updateCutVisuals();
+        }
+
+        // 4. Persist and render
+        syncTreeToBackend();
+        renderBreadcrumbs();
+        renderExplorerGrid();
+
+        showToast(`✨ Moved "${item.name}" into "${destFolder.name}"`, 'success');
+      }
+
+      // Deep Copy an item (including all nested subfolders and files) into destination
+      function copyItem(itemId, destinationFolderId) {
+        if (!state.isAdmin) {
+          showToast('Admin login required to copy items', 'error');
+          openModal('modal-admin-login');
+          return;
+        }
+        const item = findNodeById(state.fsTree, itemId);
+        const destFolder = findNodeById(state.fsTree, destinationFolderId);
+        if (!item || !destFolder) {
+          showToast('Destination folder not found', 'error');
+          return;
+        }
+        if (isDescendant(itemId, destinationFolderId)) {
+          showToast('Cannot copy a folder into its own subfolder', 'error');
+          return;
+        }
+
+        function cloneNode(node, isRoot = false) {
+          const newId = (node.type === 'folder' ? 'folder-' : 'file-') + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+          let newName = node.name;
+          const sourceParent = findParentNode(state.fsTree, node.id);
+          if (isRoot && sourceParent && sourceParent.id === destinationFolderId) {
+            newName = `${node.name} - Copy`;
+          }
+
+          const cloned = {
+            ...node,
+            id: newId,
+            name: newName
+          };
+          if (node.stickyNotes && Array.isArray(node.stickyNotes)) {
+            cloned.stickyNotes = JSON.parse(JSON.stringify(node.stickyNotes));
+          }
+          if (node.callouts && Array.isArray(node.callouts)) {
+            cloned.callouts = JSON.parse(JSON.stringify(node.callouts));
+          }
+          if (node.children && Array.isArray(node.children)) {
+            cloned.children = node.children.map(child => cloneNode(child, false));
+          }
+          return cloned;
+        }
+
+        const clonedItem = cloneNode(item, true);
+        if (!destFolder.children) destFolder.children = [];
+        destFolder.children.push(clonedItem);
+
+        syncTreeToBackend();
+        renderBreadcrumbs();
+        renderExplorerGrid();
+        showToast(`📋 Copied "${item.name}" into "${destFolder.name}"`, 'success');
+      }
+
+      function handleCutItem(itemId) {
+        if (!state.isAdmin) {
+          showToast('Admin login required to cut items', 'error');
+          openModal('modal-admin-login');
+          return;
+        }
+        const item = findNodeById(state.fsTree, itemId);
+        if (!item) return;
+        if (item.id === 'root') {
+          showToast('Cannot cut root directory', 'error');
+          return;
+        }
+        state.clipboard = {
+          action: 'cut',
+          itemId: item.id,
+          itemType: item.type,
+          itemName: item.name
+        };
+        updateCutVisuals();
+        showToast(`✂️ Cut "${item.name}". Open any folder and press Ctrl+V to move.`, 'info');
+      }
+
+      function handleCopyItem(itemId) {
+        if (!state.isAdmin) {
+          showToast('Admin login required to copy items', 'error');
+          openModal('modal-admin-login');
+          return;
+        }
+        const item = findNodeById(state.fsTree, itemId);
+        if (!item) return;
+        if (item.id === 'root') {
+          showToast('Cannot copy root directory', 'error');
+          return;
+        }
+        state.clipboard = {
+          action: 'copy',
+          itemId: item.id,
+          itemType: item.type,
+          itemName: item.name
+        };
+        updateCutVisuals();
+        showToast(`📋 Copied "${item.name}". Open any folder and press Ctrl+V to paste.`, 'info');
+      }
+
+      function handlePasteInto(targetFolderId) {
+        if (!state.isAdmin) {
+          showToast('Admin login required to paste items', 'error');
+          openModal('modal-admin-login');
+          return;
+        }
+        if (!state.clipboard || !state.clipboard.itemId) {
+          showToast('Clipboard is empty. Copy (Ctrl+C) or Cut (Ctrl+X) an item first.', 'info');
+          return;
+        }
+        const destId = targetFolderId || state.currentFolderId;
+        if (state.clipboard.action === 'cut') {
+          moveItem(state.clipboard.itemId, destId);
+        } else if (state.clipboard.action === 'copy') {
+          copyItem(state.clipboard.itemId, destId);
+        }
+      }
+
+      function updateCutVisuals() {
+        document.querySelectorAll('.explorer-card.is-cut, .list-row.is-cut').forEach(el => {
+          el.classList.remove('is-cut');
+        });
+        if (state.clipboard && state.clipboard.action === 'cut') {
+          const el = document.querySelector(`[data-id="${state.clipboard.itemId}"]`);
+          if (el) el.classList.add('is-cut');
+        }
+      }
+
+      function original_unused_moveItem(itemId, destinationFolderId) {
         if (!state.isAdmin) return;
         if (itemId === destinationFolderId) return;
         if (isDescendant(itemId, destinationFolderId)) {
@@ -10595,6 +10915,22 @@
           headerIcon.setAttribute('data-lucide', isFolder ? 'folder' : (isYouTube ? 'play-circle' : (isPdf ? 'file-text' : 'link-2')));
         }
 
+        // Cut & Copy (Admin only)
+        const ctxCut = document.getElementById('ctx-cut');
+        if (ctxCut) ctxCut.style.display = state.isAdmin ? 'flex' : 'none';
+
+        const ctxCopy = document.getElementById('ctx-copy');
+        if (ctxCopy) ctxCopy.style.display = state.isAdmin ? 'flex' : 'none';
+
+        const ctxPasteInto = document.getElementById('ctx-paste-into');
+        if (ctxPasteInto) {
+          ctxPasteInto.style.display = (state.isAdmin && isFolder && state.clipboard && state.clipboard.itemId) ? 'flex' : 'none';
+          const label = document.getElementById('ctx-paste-into-label');
+          if (label && state.clipboard && state.clipboard.itemName) {
+            label.textContent = state.clipboard.action === 'cut' ? `Paste "${state.clipboard.itemName}" here (Move)` : `Paste "${state.clipboard.itemName}" here (Copy)`;
+          }
+        }
+
         // Upload to folder (Admin only)
         const ctxFolderUpload = document.getElementById('ctx-folder-upload');
         if (ctxFolderUpload) {
@@ -10670,12 +11006,28 @@
 
       function openBgContextMenu(clientX, clientY) {
         if (!state.isAdmin) return;
+        const ctxBgPaste = document.getElementById('ctx-bg-paste');
+        if (ctxBgPaste) {
+          ctxBgPaste.style.display = (state.clipboard && state.clipboard.itemId) ? 'flex' : 'none';
+          const label = document.getElementById('ctx-bg-paste-label');
+          if (label && state.clipboard && state.clipboard.itemName) {
+            label.textContent = state.clipboard.action === 'cut' ? `Paste "${state.clipboard.itemName}" (Move)` : `Paste "${state.clipboard.itemName}" (Copy)`;
+          }
+        }
+        const ctxBgMoveCurrent = document.getElementById('ctx-bg-move-current');
+        if (ctxBgMoveCurrent) {
+          ctxBgMoveCurrent.style.display = (state.currentFolderId !== 'root') ? 'flex' : 'none';
+        }
+        const ctxBgCutCurrent = document.getElementById('ctx-bg-cut-current');
+        if (ctxBgCutCurrent) {
+          ctxBgCutCurrent.style.display = (state.currentFolderId !== 'root') ? 'flex' : 'none';
+        }
         showContextMenuAt(ctxBgMenu, clientX, clientY);
       }
 
       // Context Menu Event Listeners (Universal Desktop & Laptop Trackpad)
       document.addEventListener('contextmenu', (e) => {
-        const card = e.target.closest('.explorer-card');
+        const card = e.target.closest('.explorer-card, .list-row');
         if (card) {
           e.preventDefault();
           e.stopPropagation();
@@ -10691,7 +11043,7 @@
       // Long-Press for Mobile (450ms touch on any card triggers context menu)
       let mobileLongPressTimer = null;
       document.addEventListener('touchstart', (e) => {
-        const card = e.target.closest('.explorer-card');
+        const card = e.target.closest('.explorer-card, .list-row');
         if (!card) return;
         const touch = e.touches[0];
         mobileLongPressTimer = setTimeout(() => {
@@ -10709,6 +11061,54 @@
         ctxManageTagsBtn.addEventListener('click', () => {
           hideContextMenus();
           if (state.contextMenuItemId) openTagModal(state.contextMenuItemId);
+        });
+      }
+
+      const ctxCutBtn = document.getElementById('ctx-cut');
+      if (ctxCutBtn) {
+        ctxCutBtn.addEventListener('click', () => {
+          hideContextMenus();
+          if (state.contextMenuItemId) handleCutItem(state.contextMenuItemId);
+        });
+      }
+
+      const ctxCopyBtn = document.getElementById('ctx-copy');
+      if (ctxCopyBtn) {
+        ctxCopyBtn.addEventListener('click', () => {
+          hideContextMenus();
+          if (state.contextMenuItemId) handleCopyItem(state.contextMenuItemId);
+        });
+      }
+
+      const ctxPasteIntoBtn = document.getElementById('ctx-paste-into');
+      if (ctxPasteIntoBtn) {
+        ctxPasteIntoBtn.addEventListener('click', () => {
+          hideContextMenus();
+          if (state.contextMenuItemId) handlePasteInto(state.contextMenuItemId);
+        });
+      }
+
+      const ctxBgPasteBtn = document.getElementById('ctx-bg-paste');
+      if (ctxBgPasteBtn) {
+        ctxBgPasteBtn.addEventListener('click', () => {
+          hideContextMenus();
+          handlePasteInto(state.currentFolderId);
+        });
+      }
+
+      const ctxBgMoveCurrentBtn = document.getElementById('ctx-bg-move-current');
+      if (ctxBgMoveCurrentBtn) {
+        ctxBgMoveCurrentBtn.addEventListener('click', () => {
+          hideContextMenus();
+          if (state.currentFolderId !== 'root') openMoveModal(state.currentFolderId);
+        });
+      }
+
+      const ctxBgCutCurrentBtn = document.getElementById('ctx-bg-cut-current');
+      if (ctxBgCutCurrentBtn) {
+        ctxBgCutCurrentBtn.addEventListener('click', () => {
+          hideContextMenus();
+          if (state.currentFolderId !== 'root') handleCutItem(state.currentFolderId);
         });
       }
 
@@ -12612,9 +13012,21 @@
             <span style="color:var(--text-main);">Toggle Details Drawer</span>
             <kbd class="card-tag">I</kbd>
           </div>
-          <div style="display:flex; justify-content:space-between; padding:6px 0;">
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
             <span style="color:var(--text-main);">Star / Favorite Selected</span>
             <kbd class="card-tag">S</kbd>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="color:var(--text-main);">Copy Item / Folder</span>
+            <kbd class="card-tag">Ctrl + C</kbd>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="color:var(--text-main);">Cut (Move) Item / Folder</span>
+            <kbd class="card-tag">Ctrl + X</kbd>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="color:var(--text-main);">Paste into Folder</span>
+            <kbd class="card-tag">Ctrl + V</kbd>
           </div>
           <div style="display:flex; justify-content:space-between; padding:6px 0;">
             <span style="color:var(--text-main);">Show Shortcuts Help</span>
