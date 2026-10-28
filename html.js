@@ -4661,6 +4661,55 @@ html[data-theme] body {
   font-family: var(--font-body);
   letter-spacing: 0;
 }
+
+/* @@P1-2 */
+html[data-theme] .theme-dropdown .theme-opt {
+  --text-main: inherit;
+  --text-muted: inherit;
+  --text-subtle: inherit;
+  --bg-base: inherit;
+  --bg-surface: inherit;
+  --bg-surface-hover: inherit;
+  --bg-card: inherit;
+  --bg-card-hover: inherit;
+  --bg-glass-modal: inherit;
+  --border-specular: inherit;
+  --border-focus: inherit;
+  --accent-primary: inherit;
+  --accent-gradient: inherit;
+  --accent-glow: inherit;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 400;
+}
+html[data-theme] .theme-dropdown {
+  background: var(--peek);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: none;
+  padding: 4px;
+}
+html[data-theme] .theme-opt:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+html[data-theme] .theme-opt.active {
+  background: var(--sel);
+  color: var(--strong);
+  font-weight: 500;
+  border-color: transparent;
+}
+html[data-theme] #theme-icon-container svg,
+html[data-theme] .theme-opt svg {
+  color: var(--muted) !important;
+}
+html[data-theme] .theme-opt.active .opt-check {
+  color: var(--muted) !important;
+  opacity: 1;
+}
 </style>
 </head>
 <body>
@@ -4726,17 +4775,17 @@ html[data-theme] body {
             <div class="theme-dropdown" id="theme-menu" role="menu">
               <button type="button" class="theme-opt active" data-theme="dark" role="menuitem">
                 <i data-lucide="moon" class="lucide-icon" style="color:#38bdf8;"></i>
-                <span>Dark Mode</span>
+                <span>Dark</span>
                 <i data-lucide="check" class="opt-check" style="width:14px; height:14px; margin-left:auto; color:#38bdf8;"></i>
               </button>
               <button type="button" class="theme-opt" data-theme="amoled" role="menuitem">
                 <i data-lucide="smartphone" class="lucide-icon" style="color:#c084fc;"></i>
-                <span>OLED Black</span>
+                <span>OLED black</span>
                 <i data-lucide="check" class="opt-check" style="width:14px; height:14px; margin-left:auto; color:#c084fc;"></i>
               </button>
               <button type="button" class="theme-opt" data-theme="light" role="menuitem">
                 <i data-lucide="sun" class="lucide-icon" style="color:#f59e0b;"></i>
-                <span>Clean Light</span>
+                <span>Light</span>
                 <i data-lucide="check" class="opt-check" style="width:14px; height:14px; margin-left:auto; color:#f59e0b;"></i>
               </button>
             </div>
