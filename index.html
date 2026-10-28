@@ -5178,6 +5178,44 @@ html[data-theme] .list-row > div:nth-child(5) {
   text-align: right;
   color: var(--muted);
 }
+
+/* @@P1-9 */
+html[data-theme] .card-tag,
+html[data-theme] .badge-tag {
+  background: var(--reg-bg) !important;
+  color: var(--reg-k) !important;
+  border: none !important;
+  border-radius: 4px !important;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+html[data-theme] .context-tag {
+  max-width: 280px;
+  background: var(--reg-bg) !important;
+  color: var(--reg-k) !important;
+}
+html[data-theme] .context-tag svg,
+html[data-theme] .context-tag i {
+  display: none !important;
+}
+html[data-theme] .context-tag[title*="POWER ELECTRONICS"] {
+  background: var(--pe-bg) !important;
+  color: var(--pe) !important;
+}
+html[data-theme] .context-tag[title*="ELECTRICAL MEASUREMENTS"] {
+  background: var(--emis-bg) !important;
+  color: var(--emis) !important;
+}
+html[data-theme] .context-tag[title*="POWER SYSTEM ANALYSIS"] {
+  background: var(--psa-bg) !important;
+  color: var(--psa) !important;
+}
+html[data-theme] .context-tag[title*="LINEAR CONTROL"] {
+  background: var(--lcs-bg) !important;
+  color: var(--lcs) !important;
+}
 </style>
 </head>
 <body>
