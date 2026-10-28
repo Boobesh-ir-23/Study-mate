@@ -5401,6 +5401,108 @@ html[data-theme] .toast {
   color: var(--text);
   box-shadow: none;
 }
+
+/* @@P1-12 */
+html[data-theme] svg.lucide {
+  stroke-width: 1.5;
+}
+html[data-theme] :focus-visible {
+  outline: 2px solid var(--link) !important;
+  outline-offset: 2px;
+}
+html[data-theme] .explorer-card,
+html[data-theme] .folder-card,
+html[data-theme] .list-row,
+html[data-theme] .pill,
+html[data-theme] .btn-glass,
+html[data-theme] .crumb-item,
+html[data-theme] .modal-glass {
+  transition: background-color 150ms cubic-bezier(0.2, 0, 0, 1), color 150ms cubic-bezier(0.2, 0, 0, 1), border-color 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+@media (min-width: 769px) {
+  html[data-theme] #modal-preview .modal-glass {
+    transition: none;
+  }
+}
+@media (max-width: 768px) {
+  html[data-theme] .app-root {
+    max-width: 100% !important;
+    padding: 0 16px 24px !important;
+  }
+  html[data-theme] .glass-header {
+    top: 0 !important;
+    margin: 0 -16px 12px !important;
+    width: calc(100% + 32px) !important;
+    padding: 8px 16px !important;
+    border-radius: 0 !important;
+  }
+  html[data-theme] .brand-title span:last-child {
+    display: inline !important;
+  }
+  html[data-theme] .header-search-wrapper .search-input {
+    height: 44px !important;
+    border-radius: 6px !important;
+    font-size: 16px !important;
+  }
+  html[data-theme] .category-and-controls-bar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 44px;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  html[data-theme] .category-and-controls-bar .drive-view-controls {
+    display: contents !important;
+  }
+  html[data-theme] .mobile-filter-wrapper,
+  html[data-theme] .drive-sort-select,
+  html[data-theme] #toolbar-more-wrapper {
+    width: 100%;
+    min-width: 0;
+  }
+  html[data-theme] #toolbar-more-wrapper {
+    display: inline-block;
+  }
+  html[data-theme] .mobile-filter-btn,
+  html[data-theme] .drive-sort-select,
+  html[data-theme] #btn-toolbar-options {
+    width: 100%;
+    min-height: 44px !important;
+    height: 44px;
+    border-radius: 6px !important;
+    border: 1px solid var(--edge) !important;
+    background: var(--bg) !important;
+    justify-content: center;
+  }
+  html[data-theme] #btn-toolbar-options > span {
+    display: none !important;
+  }
+  html[data-theme] .items-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  html[data-theme] .folder-card,
+  html[data-theme] .explorer-card:not(.folder-card) {
+    min-height: 48px !important;
+    border-radius: 6px !important;
+  }
+  html[data-theme] .breadcrumbs-bar {
+    border-radius: 0 !important;
+    padding: 4px 0 !important;
+  }
+  html[data-theme] .star-btn,
+  html[data-theme] .btn-action-icon {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme] *,
+  html[data-theme] *::before,
+  html[data-theme] *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -5566,7 +5668,7 @@ html[data-theme] .toast {
 
           <!-- Consolidated Options Slide-Down Menu -->
           <div class="toolbar-more-menu-wrapper" id="toolbar-more-wrapper">
-            <button type="button" class="btn-glass" id="btn-toolbar-options" title="View Options & Tools" style="padding:6px 12px; gap:6px;">
+            <button type="button" class="btn-glass" id="btn-toolbar-options" title="View Options & Tools" aria-label="Options" style="padding:6px 12px; gap:6px;">
               <i data-lucide="sliders-horizontal" class="lucide-icon" style="width:14px; height:14px;"></i>
               <span style="font-size:0.82rem; font-weight:500;">Options</span>
               <i data-lucide="chevron-down" style="width:12px; height:12px; opacity:0.6;"></i>
