@@ -5530,7 +5530,7 @@ html[data-theme] .v3-sidebar {
 html[data-theme] .app-root {
   width: auto;
   min-width: 0;
-  max-width: none;
+  max-width: 1024px;
   margin-left: 248px;
   margin-right: 0;
 }
@@ -5578,7 +5578,7 @@ html[data-theme] .v3-sidebar-scrim { position: fixed; inset: 0; background: var(
 html[data-theme] .v3-page-header { display: flex; gap: 16px; align-items: flex-start; margin: 8px 0 20px; }
 html[data-theme] .v3-page-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--muted); }
 html[data-theme] .v3-page-icon svg { width: 28px; height: 28px; }
-html[data-theme] .v3-page-title { margin: 0; font-size: 36px; line-height: 1.15; font-weight: 700; color: var(--strong); letter-spacing: 0; }
+html[data-theme] .v3-page-title { margin: 0; font-size: 32px; line-height: 1.15; font-weight: 700; color: var(--strong); letter-spacing: -0.02em; }
 html[data-theme] .v3-page-desc { margin: 6px 0 0; color: var(--muted); font-size: 14px; max-width: 62ch; }
 html[data-theme] .v3-page-props { margin: 8px 0 0; color: var(--muted); font-size: 13px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 html[data-theme] .v3-count { margin-left: auto; color: var(--muted); font-family: var(--font-mono); font-size: 13px; font-variant-numeric: tabular-nums; }
@@ -5598,6 +5598,30 @@ html[data-theme] .v3-preview-mobile { padding: 24px; color: var(--text); }
 }
 @media (min-width: 1200px) {
   html[data-theme] body:has(#modal-preview.show) .app-root { margin-right: 600px; }
+}
+html[data-theme] .explorer-section-header { display: none; }
+html[data-theme] .folder-card::after {
+  content: "Open";
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 400;
+}
+html[data-theme] .folder-card .folder-card-top-actions { margin-left: 8px; }
+html[data-theme] .explorer-card:not(.folder-card) .card-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+html[data-theme] .explorer-card:not(.folder-card) .card-meta { margin-left: auto; white-space: nowrap; }
+@media (min-width: 769px) {
+  html[data-theme] #btn-open-suggest,
+  html[data-theme] .theme-picker { display: none; }
+  html[data-theme] .header-top-row { display: flex; justify-content: flex-end; align-items: center; }
+  html[data-theme] .v3-sidebar .brand-area { padding: 4px 8px 8px; }
+  html[data-theme] .v3-sidebar .header-search-wrapper { position: relative; width: 100%; margin: 0 0 12px; }
+  html[data-theme] .v3-sidebar .search-input { width: 100%; }
 }
 
 </style>
@@ -7396,7 +7420,7 @@ html[data-theme] .v3-preview-mobile { padding: 24px; color: var(--text); }
         contextMenuItemId: null,
         draggedItemId: null,
         moveTargetFolderId: null,
-        viewMode: localStorage.getItem('study_mate_view_mode') || 'list',
+        viewMode: localStorage.getItem('study_mate_view_mode') || 'grid',
         sortBy: localStorage.getItem('study_mate_sort_by') || 'name_asc',
         starredIds: new Set(initialStarred),
         selectedItemId: null,
@@ -8429,6 +8453,7 @@ html[data-theme] .v3-preview-mobile { padding: 24px; color: var(--text); }
                 <div class="card-icon-box \${iconClass}">
                   <i data-lucide="\${lucideName}" style="width:26px; height:26px;"></i>
                 </div>
+                \${(subjectInfoFromNames([item.name])) ? \`<i class="v3-dot v3-dot-\${subjectInfoFromNames([item.name]).key}"></i>\` : ''}
 
                 <div class="card-title" title="\${item.name}">\${displayName(item)}</div>
                 \${isFolder ? \`<span class="v3-count">\${folderCountLabel(item)}</span>\` : ''}
@@ -9868,6 +9893,26 @@ html[data-theme] .v3-preview-mobile { padding: 24px; color: var(--text); }
       if (sideOpen) sideOpen.addEventListener('click', openSidebar);
       const sideScrim = document.getElementById('v3-sidebar-scrim');
       if (sideScrim) sideScrim.addEventListener('click', closeSidebar);
+
+      function placeStudyChrome() {
+        const side = document.getElementById('v3-sidebar');
+        const tree = document.getElementById('v3-sidebar-tree');
+        const row = document.querySelector('.header-top-row');
+        const brand = document.getElementById('btn-home');
+        const search = document.querySelector('.header-search-wrapper');
+        const menu = document.getElementById('btn-sidebar-open');
+        if (!side || !tree || !row || !brand || !search) return;
+        if (window.innerWidth > 768) {
+          if (brand.parentElement !== side) side.insertBefore(brand, tree);
+          if (search.parentElement !== side) side.insertBefore(search, tree);
+        } else {
+          const afterMenu = menu && menu.parentElement === row ? menu.nextSibling : row.firstChild;
+          if (brand.parentElement !== row) row.insertBefore(brand, afterMenu);
+          if (search.parentElement !== row) row.insertBefore(search, brand.nextSibling);
+        }
+      }
+      placeStudyChrome();
+      window.addEventListener('resize', placeStudyChrome);
 
       document.getElementById('btn-open-suggest').addEventListener('click', () => {
         const path = state.currentPath;
