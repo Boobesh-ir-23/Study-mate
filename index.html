@@ -4941,6 +4941,94 @@ html[data-theme] .crumb-back-btn:active {
   transform: none;
   border-color: var(--line);
 }
+
+/* @@P1-7 */
+html[data-theme] .explorer-section-header {
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  margin-top: 24px;
+}
+html[data-theme] .explorer-section-header svg,
+html[data-theme] .explorer-section-header i {
+  display: none !important;
+}
+html[data-theme] #explorer-grid:not(.list-view) {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+html[data-theme] .folder-card {
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  min-height: 40px !important;
+  height: auto !important;
+  padding: 6px 8px !important;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  box-shadow: none;
+}
+html[data-theme] .folder-card:hover {
+  background: var(--hover);
+  transform: none !important;
+  border-color: transparent;
+  box-shadow: none !important;
+}
+html[data-theme] .folder-card .card-icon-box {
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  order: 1;
+}
+html[data-theme] .folder-card .card-icon-box svg {
+  width: 18px !important;
+  height: 18px !important;
+  color: var(--muted) !important;
+}
+html[data-theme] .folder-card .card-title {
+  order: 2;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--strong);
+  -webkit-line-clamp: 1;
+}
+html[data-theme] .folder-card > p {
+  order: 3;
+  margin: 0 !important;
+  text-align: left !important;
+  color: var(--muted) !important;
+  font-size: 13px !important;
+  flex: 1;
+  min-width: 0;
+}
+html[data-theme] .folder-card .card-tags-container {
+  order: 4;
+  margin: 0 !important;
+  justify-content: flex-end !important;
+}
+html[data-theme] .folder-card .folder-card-top-badges,
+html[data-theme] .folder-card .folder-card-top-actions {
+  position: static;
+  order: 5;
+  margin-left: auto;
+}
+html[data-theme] .folder-card:hover .card-icon-box {
+  transform: none;
+}
 </style>
 </head>
 <body>
