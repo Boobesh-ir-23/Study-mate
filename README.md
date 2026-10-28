@@ -294,8 +294,8 @@ Contributions, issues, and feature requests are welcome!
 
 | Avatar | Contributor | Role & Contributions | GitHub Profile |
 |:---:|:---:|:---|:---:|
-| <a href="https://github.com/hariharanboss"><img src="https://github.com/hariharanboss.png?size=70" width="70" height="70" style="border-radius:50%;" alt="hariharanboss" /></a> | **Hariharan** | **Lead Architect & Developer**<br/>• Full system architecture & data modeling<br/>• End-to-end source code & UI/UX design<br/>• Cloudflare Workers edge & storage engineering | [@hariharanboss](https://github.com/hariharanboss) |
 | <a href="https://github.com/Vanavan-1"><img src="https://github.com/Vanavan-1.png?size=70" width="70" height="70" style="border-radius:50%;" alt="Vanavan-1" /></a> | **Vanavan** | **Concept & Ideation**<br/>• Original project concept & core vision<br/>• Early interface mockup & layout ideation | [@Vanavan-1](https://github.com/Vanavan-1) |
+| <a href="https://github.com/hariharanboss"><img src="https://github.com/hariharanboss.png?size=70" width="70" height="70" style="border-radius:50%;" alt="hariharanboss" /></a> | **Hariharan** | **Lead Architect & Developer**<br/>• Full system architecture & data modeling<br/>• End-to-end source code & UI/UX design<br/>• Cloudflare Workers edge & storage engineering | [@hariharanboss](https://github.com/hariharanboss) |
 
 ---
 
