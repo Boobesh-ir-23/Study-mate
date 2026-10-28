@@ -4745,6 +4745,91 @@ html[data-theme] .btn-primary:hover {
   box-shadow: none !important;
   transform: none;
 }
+
+/* @@P1-4 */
+html[data-theme] .app-root {
+  max-width: 1088px;
+  padding: 0 64px 40px;
+}
+html[data-theme] .glass-header {
+  position: sticky;
+  top: 0;
+  margin: 0 -64px 16px;
+  width: calc(100% + 128px);
+  padding: 8px 64px;
+  gap: 8px;
+  background: var(--bg);
+  border: none;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
+}
+html[data-theme] .header-nav-divider {
+  background: var(--line);
+}
+html[data-theme] .brand-logo {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 6px !important;
+  background: var(--strong) !important;
+  color: var(--bg) !important;
+  box-shadow: none !important;
+}
+html[data-theme] .brand-logo svg,
+html[data-theme] .brand-logo i {
+  color: var(--bg) !important;
+  width: 14px !important;
+  height: 14px !important;
+}
+html[data-theme] .brand-area:hover .brand-logo {
+  transform: none;
+}
+html[data-theme] .brand-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--strong);
+  letter-spacing: 0;
+}
+html[data-theme] .header-search-wrapper .search-input {
+  height: 36px;
+  background: var(--hover);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 14px;
+  box-shadow: none;
+}
+html[data-theme] .header-search-wrapper .search-input::placeholder {
+  color: var(--muted);
+}
+html[data-theme] .header-search-wrapper .search-input:focus {
+  background: var(--hover);
+  border-color: var(--edge);
+  box-shadow: none;
+}
+html[data-theme] .header-search-wrapper .search-icon {
+  color: var(--muted);
+}
+html[data-theme] .btn-glass,
+html[data-theme] .btn-theme-toggle {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--muted);
+  box-shadow: none;
+}
+html[data-theme] .btn-glass:hover,
+html[data-theme] .btn-theme-toggle:hover {
+  background: var(--hover);
+  border-color: transparent;
+  color: var(--text);
+  transform: none;
+  box-shadow: none;
+}
+html[data-theme] .btn-glass:active,
+html[data-theme] .btn-theme-toggle:active {
+  transform: none;
+}
 </style>
 </head>
 <body>
@@ -4772,7 +4857,7 @@ html[data-theme] .btn-primary:hover {
         <!-- Centered Header Search Input -->
         <div class="header-search-wrapper">
           <i data-lucide="search" class="search-icon lucide-icon"></i>
-          <input type="text" class="search-input" id="search-input" placeholder="Search notes, PYQs, subjects, videos..." autocomplete="off" />
+          <input type="text" class="search-input" id="search-input" placeholder="Search notes, PYQs, subjects, videos..." aria-label="Search notes, papers and videos" autocomplete="off" />
           <button id="search-clear-btn" style="display:none;" title="Clear search">
             <i data-lucide="x" style="width:14px; height:14px;"></i>
           </button>
