@@ -4748,15 +4748,15 @@ html[data-theme] .btn-primary:hover {
 
 /* @@P1-4 */
 html[data-theme] .app-root {
-  max-width: 1088px;
-  padding: 0 64px 40px;
+  max-width: 1440px;
+  padding: 0 32px 40px;
 }
 html[data-theme] .glass-header {
   position: sticky;
   top: 0;
-  margin: 0 -64px 16px;
-  width: calc(100% + 128px);
-  padding: 8px 64px;
+  margin: 0 -32px 16px;
+  width: calc(100% + 64px);
+  padding: 8px 32px;
   gap: 8px;
   background: var(--bg);
   border: none;
@@ -4856,6 +4856,15 @@ html[data-theme] .pill.active {
 }
 html[data-theme] .category-and-controls-bar {
   align-items: flex-end;
+  min-width: 0;
+}
+html[data-theme] .category-and-controls-bar .filter-pills {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow-x: auto;
+}
+html[data-theme] .category-and-controls-bar .drive-view-controls {
+  flex-shrink: 0;
 }
 html[data-theme] .drive-sort-select {
   height: 36px;
