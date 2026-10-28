@@ -4710,6 +4710,41 @@ html[data-theme] .theme-opt.active .opt-check {
   color: var(--muted) !important;
   opacity: 1;
 }
+
+/* @@P1-3 */
+html[data-theme="dark"] *,
+html[data-theme="amoled"] *,
+html[data-theme="light"] * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html[data-theme] .ambient-mesh {
+  display: none !important;
+}
+html[data-theme] .brand-title span {
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: var(--strong);
+}
+html[data-theme] .btn-primary,
+html[data-theme] .gauge-bar-fill {
+  background: var(--btn) !important;
+  background-image: none !important;
+}
+html[data-theme] .btn-primary {
+  color: var(--on-btn) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+html[data-theme] .btn-primary:hover {
+  background: var(--btn) !important;
+  background-image: none !important;
+  filter: brightness(1.08);
+  box-shadow: none !important;
+  transform: none;
+}
 </style>
 </head>
 <body>
