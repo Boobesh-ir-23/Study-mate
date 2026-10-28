@@ -4901,6 +4901,47 @@ html[data-theme] .toolbar-menu-shortcut {
   color: var(--muted);
   border: 1px solid var(--line);
 }
+
+/* @@P1-6 */
+html[data-theme] .breadcrumbs-bar {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 4px 0 12px;
+  box-shadow: none;
+}
+html[data-theme] .crumb-item {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 400;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+html[data-theme] .crumb-item:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+html[data-theme] .crumb-item.current {
+  color: var(--text);
+  font-weight: 400;
+}
+html[data-theme] .crumb-divider {
+  color: var(--muted);
+  opacity: 0.7;
+}
+html[data-theme] .crumb-back-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  font-weight: 400;
+}
+html[data-theme] .crumb-back-btn:hover,
+html[data-theme] .crumb-back-btn:active {
+  background: var(--hover);
+  transform: none;
+  border-color: var(--line);
+}
 </style>
 </head>
 <body>
