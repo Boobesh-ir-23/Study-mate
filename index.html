@@ -4829,6 +4829,77 @@ html[data-theme] .btn-glass:active,
 html[data-theme] .btn-theme-toggle:active {
   transform: none;
 }
+
+/* @@P1-5 */
+html[data-theme] .pill {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 400;
+  padding: 8px 12px;
+  border-bottom: 2px solid transparent !important;
+}
+html[data-theme] .pill:hover {
+  color: var(--text);
+  border-color: transparent;
+  background: transparent !important;
+}
+html[data-theme] .pill.active {
+  background: transparent !important;
+  color: var(--strong) !important;
+  border-bottom: 2px solid var(--text) !important;
+  box-shadow: none !important;
+}
+html[data-theme] .category-and-controls-bar {
+  align-items: flex-end;
+}
+html[data-theme] .drive-sort-select {
+  height: 36px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: var(--font-body);
+}
+html[data-theme] .drive-sort-select:focus {
+  border-color: var(--link);
+  box-shadow: none;
+}
+html[data-theme] #filter-status-container > * {
+  background: var(--hover);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: none;
+  color: var(--text);
+}
+html[data-theme] .toolbar-more-dropdown,
+html[data-theme] .mobile-filter-dropdown {
+  background: var(--peek);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: none;
+}
+html[data-theme] .toolbar-menu-item {
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 400;
+}
+html[data-theme] .toolbar-menu-item:hover,
+html[data-theme] .mobile-filter-opt:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+html[data-theme] .toolbar-menu-shortcut {
+  font-family: var(--font-mono);
+  background: var(--hover);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
 </style>
 </head>
 <body>
