@@ -5029,6 +5029,155 @@ html[data-theme] .folder-card .folder-card-top-actions {
 html[data-theme] .folder-card:hover .card-icon-box {
   transform: none;
 }
+
+/* @@P1-8 */
+html[data-theme] .explorer-card:not(.folder-card) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 40px;
+  padding: 6px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  box-shadow: none;
+}
+html[data-theme] .explorer-card:not(.folder-card):hover {
+  background: var(--hover);
+  transform: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+html[data-theme] .explorer-card:not(.folder-card):active {
+  transform: none;
+}
+html[data-theme] .explorer-card.selected,
+html[data-theme] .folder-card.selected {
+  background: var(--sel) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+html[data-theme] .explorer-card:not(.folder-card) .card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  min-width: 0;
+  grid-column: 1;
+  grid-row: 1;
+}
+html[data-theme] .explorer-card:not(.folder-card) .card-icon-box {
+  width: 20px;
+  height: 20px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+html[data-theme] .explorer-card:not(.folder-card) .card-icon-box svg {
+  width: 18px !important;
+  height: 18px !important;
+  color: var(--muted) !important;
+}
+html[data-theme] .explorer-card:hover .card-icon-box {
+  transform: none;
+}
+html[data-theme] .explorer-card:not(.folder-card) .card-info {
+  min-width: 0;
+}
+html[data-theme] .explorer-card:not(.folder-card) .card-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--strong);
+  margin: 0;
+  -webkit-line-clamp: 1;
+}
+html[data-theme] .card-meta {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+html[data-theme] .card-footer > span {
+  display: none !important;
+}
+html[data-theme] .explorer-card:not(.folder-card) .card-footer {
+  grid-column: 2;
+  grid-row: 1;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--muted);
+}
+html[data-theme] .explorer-card:not(.folder-card) .card-tags-container,
+html[data-theme] .explorer-card:not(.folder-card) > p {
+  grid-column: 1 / -1;
+}
+html[data-theme] .btn-action-icon {
+  color: var(--muted);
+  border-radius: 6px;
+}
+html[data-theme] .btn-action-icon:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+html[data-theme] .star-btn.starred,
+html[data-theme] .star-btn.starred svg {
+  color: var(--warn) !important;
+}
+html[data-theme] .star-btn.starred svg {
+  fill: var(--warn) !important;
+}
+html[data-theme] .star-btn:hover {
+  transform: none;
+  color: var(--warn);
+}
+html[data-theme] .items-grid.list-view {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  gap: 0;
+}
+html[data-theme] .list-header-row,
+html[data-theme] .list-row {
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid var(--line);
+}
+html[data-theme] .list-header-row {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--muted);
+}
+html[data-theme] .list-row:hover {
+  background: var(--hover);
+  border-color: transparent;
+  border-bottom-color: var(--line);
+}
+html[data-theme] .list-row.selected {
+  background: var(--sel) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+html[data-theme] .list-cell-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--strong);
+}
+html[data-theme] .list-cell-name svg {
+  color: var(--muted) !important;
+}
+html[data-theme] .list-header-row > div:nth-child(5),
+html[data-theme] .list-row > div:nth-child(5) {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  text-align: right;
+  color: var(--muted);
+}
 </style>
 </head>
 <body>
