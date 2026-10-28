@@ -4754,7 +4754,7 @@ html[data-theme] .glass-header {
   position: sticky;
   top: 0;
   margin: 0 -32px 16px;
-  width: calc(100% + 64px);
+  width: auto;
   padding: 8px 32px;
   gap: 8px;
   background: var(--bg);
@@ -5527,8 +5527,17 @@ html[data-theme] .v3-sidebar {
   padding: 12px 8px 8px;
 }
 html[data-theme] .app-root {
-  margin-left: 248px;
+  width: auto;
+  min-width: 0;
   max-width: none;
+  margin-left: 248px;
+  margin-right: 0;
+}
+html[data-theme] .header-top-row,
+html[data-theme] .header-search-wrapper,
+html[data-theme] .header-actions,
+html[data-theme] .category-and-controls-bar {
+  min-width: 0;
 }
 html[data-theme] .v3-side-scroll {
   overflow: auto;
