@@ -5216,6 +5216,80 @@ html[data-theme] .context-tag[title*="LINEAR CONTROL"] {
   background: var(--lcs-bg) !important;
   color: var(--lcs) !important;
 }
+
+/* @@P1-10 */
+html[data-theme] .callout-card,
+html[data-theme] .sticky-note-card,
+html[data-theme] .study-callout-card {
+  background: var(--callout) !important;
+  background-image: none !important;
+  border: none !important;
+  border-left: none !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  color: var(--text);
+}
+html[data-theme] .callout-icon-box {
+  background: transparent !important;
+  color: var(--muted) !important;
+  box-shadow: none !important;
+  width: 20px;
+  height: 20px;
+  border-radius: 0;
+}
+html[data-theme] .callout-badge {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  font-weight: 400;
+  background: transparent !important;
+  border: none !important;
+  color: var(--muted) !important;
+  padding: 0;
+}
+html[data-theme] .callout-title,
+html[data-theme] .sticky-title {
+  color: var(--strong);
+  font-weight: 600;
+  font-size: 15px;
+}
+html[data-theme] .callout-body,
+html[data-theme] .sticky-content,
+html[data-theme] .study-callout-card .callout-text {
+  color: var(--text) !important;
+  font-size: 15px;
+  line-height: 1.55;
+}
+html[data-theme] .callout-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+}
+html[data-theme] .callout-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+  border-color: var(--line);
+}
+html[data-theme] .callout-card:has(svg[data-lucide="target"]),
+html[data-theme] .callout-card:has(svg[data-lucide="alert-triangle"]),
+html[data-theme] .callout-card:has(svg[data-lucide="triangle-alert"]) {
+  background: var(--warn-bg) !important;
+}
+html[data-theme] .callout-card:has(svg[data-lucide="target"]) .callout-icon-box,
+html[data-theme] .callout-card:has(svg[data-lucide="alert-triangle"]) .callout-icon-box,
+html[data-theme] .callout-card:has(svg[data-lucide="triangle-alert"]) .callout-icon-box,
+html[data-theme] .callout-card:has(svg[data-lucide="target"]) .callout-badge,
+html[data-theme] .callout-card:has(svg[data-lucide="alert-triangle"]) .callout-badge,
+html[data-theme] .callout-card:has(svg[data-lucide="triangle-alert"]) .callout-badge,
+html[data-theme] .callout-card:has(svg[data-lucide="target"]) .callout-title,
+html[data-theme] .callout-card:has(svg[data-lucide="alert-triangle"]) .callout-title,
+html[data-theme] .callout-card:has(svg[data-lucide="triangle-alert"]) .callout-title {
+  color: var(--warn) !important;
+}
+html[data-theme] .callout-link {
+  color: var(--link);
+}
 </style>
 </head>
 <body>
