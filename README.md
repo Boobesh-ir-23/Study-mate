@@ -306,5 +306,5 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 ---
 
 <p align="center">
-  Crafted with ❤️ for students and educators worldwide.
+  Crafted with ❤️ for students and educators worldwide. :-)
 </p>
